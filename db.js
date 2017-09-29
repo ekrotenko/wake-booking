@@ -1,6 +1,6 @@
-const Sequelize  = require('sequelize');
+const Sequelize = require('sequelize');
 
-const db = new Sequelize('wake_booking', 'root', 'j1l9k21988',{
+const db = new Sequelize('wake_booking', 'root', 'j1l9k21988', {
     dialect: 'mysql',
     logging: false
 });
@@ -15,8 +15,8 @@ const Order = require('./models/Order')
 Park.hasMany(Ropeway);
 Ropeway.belongsTo(Park);
 
-Park.belongsToMany(User, {as: 'park', through: 'parksUsers'});
-User.belongsToMany(Park, {as: 'admin', through: 'parksUsers'});
+Park.belongsToMany(User, {as: 'admin', through: 'parksUsers'});
+User.belongsToMany(Park, {as: 'park', through: 'parksUsers'});
 
 Order.belongsTo(User);
 Order.belongsTo(Ropeway);
