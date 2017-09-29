@@ -1,0 +1,24 @@
+{
+  "name": "wake.booking.api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.17.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.3",
+    "express": "~4.15.2",
+    "jade": "~1.11.0",
+    "moment": "^2.18.1",
+    "morgan": "~1.8.1",
+    "mysql": "^2.14.1",
+    "mysql2": "^1.4.2",
+    "nodemon": "^1.12.1",
+    "sequelize": "^4.11.4",
+    "serve-favicon": "~2.4.2",
+    "volleyball": "^1.4.1"
+  }
+}
