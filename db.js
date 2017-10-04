@@ -15,8 +15,8 @@ const Order = require('./models/Order')
 Park.hasMany(Ropeway);
 Ropeway.belongsTo(Park);
 
-Park.belongsToMany(User, {as: 'admin', through: 'parksUsers'});
-User.belongsToMany(Park, {as: 'park', through: 'parksUsers'});
+Park.belongsToMany(User, {as: 'admins', through: 'parksUsers'});
+User.belongsToMany(Park, {as: 'ownedParks', through: 'parksUsers'});
 
 Order.belongsTo(User);
 Order.belongsTo(Ropeway);

@@ -6,6 +6,7 @@ const path = require('path');
 const db = require('./db');
 // Routers:
 const parksRouter = require('./routes/parks');
+const usersRouter = require('./routes/users');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 // Using routers:
 app.use('/parks', parksRouter);
+app.use('/users', usersRouter);
 
 
 app.use('*', (req, res, next) => {

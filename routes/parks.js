@@ -2,8 +2,7 @@ const router = require('express').Router();
 const Park = require('../models/Park');
 const User = require('../models/User');
 
-
-// gets all parks
+// get all parks
 router.get('/', (req, res, next) => {
     Park.findAll({
         include: [{model: User, as: 'admin'}]
@@ -20,14 +19,13 @@ router.get('/:id', (req, res, next) => {
 });
 
 // update specific park
-// TODO: Make function to return whole record after update
 router.put('/:id', (req, res, next) => {
-    Park.findById(req.params.id)
+    Park.findById(req.params.id, {
+        include: [{all:true}]
+    })
         .then(park => {
             park.update(req.body)
-        })
-        .then(updatedPark => {
-            res.send(updatedPark);
+                .then(res.send(park));
         })
         .catch(next);
 });
