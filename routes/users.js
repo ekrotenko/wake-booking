@@ -39,15 +39,17 @@ router.post('/', (req, res, next) => {
 
 // add park to user
 router.put('/:id/park', (req, res, next) => {
-    User.findById(req.params.id)
-        .then(user=>{
-            if(!user.isAdmin){
+    User.findById(req.params.id, {
+        include: [{all: true}]
+    })
+        .then(user => {
+            if (!user.isAdmin) {
                 res.send('User is not admin. Impossible to add park');
             }
-            else user.update(req.body)
-                .then(res.send(user));
-        })
-        .catch(next);
+            else user.addOwnedPark(req.body.parkId)
+                .then(res.send.bind(res))
+                .catch(next);
+        });
 });
 
 
