@@ -37,20 +37,14 @@ router.post('/', (req, res, next) => {
         .catch(next);
 });
 
-// add park to user
-router.put('/:id/park', (req, res, next) => {
-    User.findById(req.params.id, {
-        include: [{all: true}]
-    })
+// delete park
+router.delete('/:id', (req, res, next) => {
+    User.findById(req.params.id)
         .then(user => {
-            if (!user.isAdmin) {
-                res.send('User is not admin. Impossible to add park');
-            }
-            else user.addOwnedPark(req.body.parkId)
+            user.destroy()
                 .then(res.send.bind(res))
                 .catch(next);
         });
 });
-
 
 module.exports = router;
