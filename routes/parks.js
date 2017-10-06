@@ -37,8 +37,8 @@ router.put('/:id', (req, res, next) => {
             User.findById(req.body.userId)
                 .then(user => {
                     if (user && user.isAdmin) {
-                        park.addAdmin(req.body.userId)
-                            .then(res.send(park));
+                        req.park.addAdmin(req.body.userId)
+                            .then(res.send(req.park));
                     }
                     else {
                         res.send('User is not valid or not exist. Impossible to add to park');
@@ -76,7 +76,7 @@ router.delete('/:id', (req, res, next) => {
         .catch(next);
 });
 
-// delete user
+// delete admin user
 router.delete('/:id/user/:userId', (req, res, next) => {
     Park.findById(req.params.id)
         .then(park => {
@@ -96,6 +96,5 @@ router.delete('/:id/user/:userId', (req, res, next) => {
                 });
         })
 });
-
 
 module.exports = router;
