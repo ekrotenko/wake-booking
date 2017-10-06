@@ -3,53 +3,59 @@ const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
 const bcrypt = require('bcrypt');
 
-const User = db.define('user',{
-    firstName:{
+const User = db.define('user', {
+    firstName: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
+        validate: {
             len: [3, 30]
         }
     },
-    lastName:{
+    lastName: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
+        validate: {
             len: [3, 30]
         }
     },
-    email:{
+    email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-        validate:{
-            isEmail:true,
+        validate: {
+            isEmail: true,
             len: [5, 50]
         }
     },
-    password:{
+    password: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
-            min:6
+        validate: {
+            min: 6
         }
     },
-    phone:{
+    phone: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
+        validate: {
             min: 10,
         }
     },
-    isAdmin:{
-        type:DataTypes.BOOLEAN,
+    isAdmin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    isOwner: {
+        type: DataTypes.BOOLEAN,
         defaultValue: false
     }
-},{
+}, {
     paranoid: true,
-    hooks:{
-        afterValidate: user=>{
-            user.password= bcrypt.hashSync(user.password, 8);
+    hooks: {
+        afterValidate: user => {
+            user.password = bcrypt.hashSync(user.password, 8);
+            if (user.isOwner)
+                user.isAdmin = true;
         }
     }
 });
