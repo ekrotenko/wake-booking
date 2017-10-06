@@ -78,6 +78,39 @@ const userData = [
         password: '123456',
         phone: '0739476308',
     },
+    {
+        firstName: 'Sergey',
+        lastName: 'Marlenko',
+        email: faker.internet.email(),
+        password: '123456',
+        phone: '0509476308',
+        isOwner: true
+    },
+    {
+        firstName: 'Tatyana',
+        lastName: 'Vorobieva',
+        email: faker.internet.email(),
+        password: '123456',
+        phone: '0509470308',
+        isOwner: true
+    },
+    {
+        firstName: 'Ruslan',
+        lastName: 'Lohopetov',
+        email: faker.internet.email(),
+        password: '123456',
+        phone: '0502876308',
+        isOwner: true
+    },
+    {
+        firstName: 'Roman',
+        lastName: 'Makarenkov',
+        email: faker.internet.email(),
+        password: '123456',
+        phone: '0507076308',
+        isOwner: true
+    },
+
 ];
 
 const orderData = [
