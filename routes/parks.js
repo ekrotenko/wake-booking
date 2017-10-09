@@ -38,7 +38,11 @@ router.put('/:id', (req, res, next) => {
                 .then(user => {
                     if (user && user.isAdmin) {
                         req.park.addAdmin(req.body.userId)
-                            .then(res.send(req.park));
+                            .then(() => {
+                                req.park.reload().then(() => {
+                                    res.send(req.park);
+                                });
+                            });
                     }
                     else {
                         res.send('User is not valid or not exist. Impossible to add to park');
@@ -78,23 +82,24 @@ router.delete('/:id', (req, res, next) => {
 
 // delete admin user
 router.delete('/:id/user/:userId', (req, res, next) => {
-    Park.findById(req.params.id)
-        .then(park => {
-            park.getAdmin({
-                where: {
-                    id: req.params.userId
-                }
-            })
-                .then(admins => {
-                    if (admins.length === 0 || admins[0].isOwner)
-                        res.send('User is unavailable');
-                    else {
-                        park.removeAdmin(req.params.userId)
-                            .then(res.send.bind(res))
-                            .catch(next);
-                    }
-                });
-        })
+    req.park.getAdmin({
+        where: {
+            id: req.params.userId
+        }
+    })
+        .then(admins => {
+            if (admins.length === 0 || admins[0].isOwner)
+                res.send('User is unavailable');
+            else {
+                req.park.removeAdmin(req.params.userId)
+                    .then(() => {
+                        req.park.reload().then(() => {
+                            res.send(req.park);
+                        });
+                    })
+                    .catch(next);
+            }
+        });
 });
 
 module.exports = router;
