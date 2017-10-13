@@ -10,9 +10,9 @@ module.exports = db;
 const Park = require('./models/Park');
 const Ropeway = require('./models/Ropeway');
 const User = require('./models/User');
-const Order = require('./models/Order')
+const Order = require('./models/Order');
 
-Park.hasMany(Ropeway);
+Park.hasMany(Ropeway, {foreignKey: {name: 'parkId', allowNull: false}});
 Ropeway.belongsTo(Park);
 
 Park.belongsToMany(User, {as: 'admin', through: 'parksUsers'});

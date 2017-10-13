@@ -41,21 +41,10 @@ router.post('/', (req, res, next) => {
         })
 });
 
-// TODO: finish function to update ropeway. Park Id is not required
 router.put('/:id', (req, res, next) => {
-    if(!req.ropeway.parkId) {
-        Park.findById(req.body.parkId)
-            .then(park => {
-                if (park) {
-                    req.ropeway.update(req.body)
-                        .then(res.send.bind(res))
-                        .catch(next)
-                }
-                else res.sendStatus(404);
-            })
-    }
-    else res.send('Ropeway must have park')
-
+    req.ropeway.update(req.body)
+        .then(res.send.bind(res))
+        .catch(next)
 });
 
 router.delete('/:id', (req, res, next) => {

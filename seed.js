@@ -13,23 +13,28 @@ const faker = require('faker');
 const ropewayData = [
     {
         name: '15 m gigant',
-        description: 'Vertigo ropeway 15 m'
+        description: 'Vertigo ropeway 15 m',
+        parkId: 3,
     },
     {
         name: 'Vertigo',
-        description: '11 m vertigo ropeway in arizona club'
+        description: '11 m vertigo ropeway in arizona club',
+        parkId: 2,
     },
     {
         name: 'Left',
-        description: 'Left ropeway with 2 kickers and slider'
+        description: 'Left ropeway with 2 kickers and slider',
+        parkId: 1
     },
     {
         name: '10 m Vertigo',
-        description: 'Smaller regular RP. Has kicker'
+        description: 'Smaller regular RP. Has kicker',
+        parkId: 3
     },
     {
         name: 'Right',
-        description: 'Right RP with wide slider and small kicker'
+        description: 'Right RP with wide slider and small kicker',
+        parkId: 1
     },
 ];
 
@@ -203,6 +208,26 @@ db.sync({ force: true })
     })
     // here, we go through all the models one by one, create each
     // element from the seed arrays above, and log how many are created
+
+    .then(() => {
+        return Promise.map(userData, user => User.create(user))
+    })
+    .then(createdUsers => {
+        console.log(`${createdUsers.length} users created`);
+    })
+    // .then(() => {
+    //     return Promise.map(orderData, order => Order.create(order))
+    // })
+    // .then(createdOrders => {
+    //     console.log(`${createdOrders.length} orders created`);
+    // })
+    .then(() => {
+        return Promise.map(parkData, park => Park.create(park))
+    })
+    .then(createdParks => {
+        console.log(`${createdParks.length} parks created`);
+    })
+
     .then(() => {
         return Promise.map(ropewayData, function(ropeway) {
             return Ropeway.create(ropeway);
@@ -211,24 +236,7 @@ db.sync({ force: true })
     .then(createdRopeways => {
         console.log(`${createdRopeways.length} ropeways created`);
     })
-    .then(() => {
-        return Promise.map(userData, user => User.create(user))
-    })
-    .then(createdUsers => {
-        console.log(`${createdUsers.length} users created`);
-    })
-    .then(() => {
-        return Promise.map(orderData, order => Order.create(order))
-    })
-    .then(createdOrders => {
-        console.log(`${createdOrders.length} orders created`);
-    })
-    .then(() => {
-        return Promise.map(parkData, park => Park.create(park))
-    })
-    .then(createdParks => {
-        console.log(`${createdParks.length} parks created`);
-    })
+
     .then(() => {
         console.log('Seeded successfully');
     })

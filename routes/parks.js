@@ -82,16 +82,15 @@ router.delete('/:id', (req, res, next) => {
 
 // delete admin user
 router.delete('/:id/user/:userId', (req, res, next) => {
-    req.park.getAdmin({
-        where: {
-            id: req.params.userId
-        }
-    })
+    req.park.getAdmin()
         .then(admins => {
-            if (admins.length === 0 || admins[0].isOwner)
+            const adminToRemove = admins.find(admin => admin.dataValues.id === parseInt(req.params.userId));
+            const owners = admins.filter(admin => admin.dataValues.isOwner);
+            if (owners.length < 2 && adminToRemove.isOwner) {
                 res.send('User is unavailable');
+            }
             else {
-                req.park.removeAdmin(req.params.userId)
+                req.park.removeAdmin(adminToRemove)
                     .then(() => {
                         req.park.reload().then(() => {
                             res.send(req.park);
