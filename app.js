@@ -8,6 +8,7 @@ const db = require('./db');
 const parksRouter = require('./routes/parks');
 const usersRouter = require('./routes/users');
 const ropewaysRouter = require('./routes/ropeways');
+const ordersRouter = require('./routes/orders');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/parks', parksRouter);
 app.use('/users', usersRouter);
 app.use('/ropeways', ropewaysRouter);
+app.use('/orders', ordersRouter);
 
 
 app.use('*', (req, res, next) => {

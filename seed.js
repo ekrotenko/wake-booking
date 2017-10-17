@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const db = require('./db');
 const Ropeway = require('./models/Ropeway');
 const Park = require('./models/Park');
+const Schedule = require('./models/Schedule');
 const Order = require('./models/Order');
 const User = require('./models/User');
 const faker = require('faker');
@@ -116,6 +117,45 @@ const userData = [
         isOwner: true
     },
 
+];
+
+const scheduleData = [
+    {
+        dateFrom: '2017-05-01',
+        dateTo: '2017-10-31',
+        timeFrom: '10:00',
+        timeTo: '20:00',
+        duration: 60,
+        interval: 15,
+        parkId: 1
+    },
+    {
+        dateFrom: '2017-06-01',
+        dateTo: '2017-10-31',
+        timeFrom: '9:00',
+        timeTo: '20:00',
+        duration: 60,
+        interval: 30,
+        parkId: 2
+    },
+    {
+        dateFrom: '2017-05-01',
+        dateTo: '2017-10-31',
+        timeFrom: '11:00',
+        timeTo: '20:00',
+        duration: 60,
+        interval: 60,
+        parkId: 3
+    },
+    {
+        dateFrom: '2017-05-01',
+        dateTo: '2017-10-01',
+        timeFrom: '11:00',
+        timeTo: '19:00',
+        duration: 60,
+        interval: 30,
+        parkId: 4
+    }
 ];
 
 const orderData = [
@@ -235,6 +275,15 @@ db.sync({ force: true })
     })
     .then(createdRopeways => {
         console.log(`${createdRopeways.length} ropeways created`);
+    })
+
+    .then(()=>{
+        return Promise.map(scheduleData, function(schedule){
+            return Schedule.create(schedule);
+        })
+    })
+    .then(createdSchedules=>{
+        console.log(`${createdSchedules.length} schedules created`)
     })
 
     .then(() => {
