@@ -49,68 +49,62 @@ const Order = db.define('order', {
         paranoid: true,
         validate: {
             verifyTimeSlot() {
-                let matches = [];
+                return Ropeway.findById(this.ropewayId)
+                    .then(ropeway => ropeway.getPark())
+                    .then(park => park.getSchedule())
+                    .then(schedule => {
+                        return Order.findAll({
+                            where: {
+                                date: this.date,
+                                ropewayId: this.ropewayId
+                            }
+                        })
+                            .then(orders => {
+                                const allocated = [];
+                                orders.forEach((order, index) => {
+                                    const duration = moment.duration(moment(order.endAt, timeFormat)
+                                        .diff(moment(order.startAt, timeFormat)), 'ms').asMinutes();
 
-                 Ropeway.findById(this.ropewayId)
-                    .then(ropeway => {
-                        ropeway.getPark()
-                            .then(park => {
-                                park.getSchedule()
-                                    .then(rSchedule => {
-                                        Order.findAll({
-                                            where: {
-                                                date: this.date,
-                                                ropewayId: this.ropewayId
-                                            }
-                                        })
-                                            .then(orders => {
-                                                const allocated = [];
-                                                orders.forEach((order, index) => {
-                                                    const duration = moment.duration(moment(order.endAt, timeFormat)
-                                                        .diff(moment(order.startAt, timeFormat)), 'ms').asMinutes();
-
-                                                    allocated[index] = {
-                                                        from: `${order.date} ${order.startAt}`,
-                                                        duration
-                                                    }
-                                                });
-
-                                                timeSettings = {
-                                                    from: this.date,
-                                                    to: moment(this.date).add(1, 'days').format('YYYY-MM-DD'),
-                                                    duration: rSchedule.duration,
-                                                    interval: rSchedule.interval,
-                                                    schedule: {
-                                                        weekdays: {
-                                                            from: rSchedule.timeFrom,
-                                                            to: rSchedule.timeTo,
-                                                            // unavailability: [
-                                                            //     {
-                                                            //         from: rSchedule.breakFrom,
-                                                            //         to: rSchedule.breakTo
-                                                            //     }
-                                                            // ]
-                                                        },
-                                                        allocated
-                                                    }
-                                                };
-
-                                                matches = scheduler.getAvailability(timeSettings)[`${this.date}`].filter(slot => {
-                                                    return slot.time === this.startAt && !slot.available;
-                                                });
-
-                                                if (!!matches.length) {
-                                                    throw new Error('This time is not available');
-                                                }
-                                            })
-                                    })
+                                    allocated[index] = {
+                                        from: `${order.date} ${order.startAt}`,
+                                        duration
+                                    }
+                                });
+                                const timeSettings = {
+                                    from: this.date,
+                                    to: moment(this.date).add(1, 'days').format('YYYY-MM-DD'),
+                                    duration: schedule.duration,
+                                    interval: schedule.interval,
+                                    schedule: {
+                                        weekdays: {
+                                            from: schedule.timeFrom,
+                                            to: schedule.timeTo,
+                                            // unavailability: [
+                                            //     {
+                                            //         from: rSchedule.breakFrom,
+                                            //         to: rSchedule.breakTo
+                                            //     }
+                                            // ]
+                                        },
+                                        allocated
+                                    }
+                                };
+                                const allSlots = scheduler.getAvailability(timeSettings)[`${this.date}`];
+                                const matches = allSlots.filter(slot => {
+                                    const slotTime = moment(slot.time, timeFormat).add('minutes', 1);
+                                    const start = moment(this.startAt, timeFormat);
+                                    const end = moment(this.endAt, timeFormat);
+                                    return moment(slotTime).isBetween(start, end, 'minutes') && !slot.available;
+                                });
+                                return matches;
                             })
                     })
-                    .catch(er => {
-                        throw new Error(er);
-                    })
+                    .then(matches => {
+                        if (!!matches.length)
+                            throw new Error('This time slot is not available');
+                    });
             }
-        }
+        },
     }
 );
 
