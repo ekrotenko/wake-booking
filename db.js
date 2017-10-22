@@ -2,7 +2,8 @@ const Sequelize = require('sequelize');
 
 const db = new Sequelize('wake_booking', 'root', 'j1l9k21988', {
     dialect: 'mysql',
-    logging: false
+    logging: false,
+    operatorsAliases: false,
 });
 module.exports = db;
 
@@ -13,6 +14,7 @@ const User = require('./models/User');
 const Order = require('./models/Order');
 const Schedule = require('./models/Schedule');
 
+// associations:
 Park.hasMany(Ropeway, {foreignKey: {name: 'parkId', allowNull: false}});
 Ropeway.belongsTo(Park);
 
@@ -21,8 +23,8 @@ User.belongsToMany(Park, {as: 'ownedPark', through: 'parksUsers'});
 
 Park.hasOne(Schedule, {foreignKey: {name: 'parkId', allowNull: false}});
 
-Order.belongsTo(User);
-Order.belongsTo(Ropeway);
+Order.belongsTo(User, {foreignKey: {allowNull: false}});
+Order.belongsTo(Ropeway, {foreignKey: {allowNull: false}});
 User.hasMany(Order);
 Ropeway.hasMany(Order);
 
