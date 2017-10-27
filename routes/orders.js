@@ -1,10 +1,6 @@
-
+const ScheduleHelpers = require('../helpers/schedule.helpers');
 const router = require('express').Router();
 const Order = require('../models/Order');
-const Schedule = require('../models/Schedule');
-const Park = require('../models/Park');
-const Ropeway = require('../models/Ropeway');
-
 
 router.param('id', (req, res, next, id) => [
     Order.findById(id)
@@ -24,10 +20,23 @@ router.get('/', (req, res, next) => {
         .catch(next);
 });
 
+router.get('/available', (req, res, next) => {
+    const date = req.query.date;
+    const ropewayId = req.query.ropewayId;
+    if (!date || !ropewayId) {
+        res.sendStatus(404);
+    }
+    ScheduleHelpers.getTimeSlots(date, ropewayId)
+        .then(slots => {
+            res.send(slots);
+        })
+        .catch(er => res.send(er.message));
+});
+
 router.post('/', (req, res, next) => {
     Order.create(req.body)
         .then(res.send.bind(res))
-        .catch(next);
+        .catch(er=>res.send(er.message));
 });
 
 module.exports = router;

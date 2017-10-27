@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
-
+// TODO: add order add/cancel time options
 const Schedule = db.define('schedule', {
     dateFrom: {
         type: DataTypes.DATEONLY,
