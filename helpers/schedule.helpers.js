@@ -41,6 +41,14 @@ class ScheduleHelpers {
                                     //     }
                                     // ]
                                 },
+                                saturday: {
+                                    from: schedule.timeFrom,
+                                    to: schedule.timeTo,
+                                },
+                                sunday: {
+                                    from: schedule.timeFrom,
+                                    to: schedule.timeTo,
+                                },
                                 allocated: _getAllocations(orders)
                             }
                         };

@@ -71,7 +71,7 @@ const Order = db.define('order', {
                 return SchedulerHelpers.getTimeSlots(this.date, this.ropewayId)
                     .then(allSlots => {
                         if(!allSlots.find(slot=>slot.time===this.startAt)) {
-                            throw new Error('Schedule interval mismatch')
+                            throw new Error('Schedule interval mismatch');
                         }
 
                         const matches = allSlots.filter(slot => {
