@@ -54,8 +54,9 @@ const Order = db.define('order', {
     {
         paranoid: true,
         validate: {
+            // TODO: Do not validate if first validation fails
             verifyScheduleOptions() {
-                return SchedulerHelpers.getRopewaySchedule(this.ropewayId)
+                return SchedulerHelpers.getRopewaySchedule(this.ropewayId, this.date)
                     .then(schedule => {
                         const slotDuration = SchedulerHelpers.getDuration(this.startAt, this.endAt);
                         if (slotDuration % schedule.duration > 0) {

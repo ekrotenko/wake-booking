@@ -158,7 +158,7 @@ const scheduleData = [
     },
     {
         dateFrom: '2017-05-01',
-        dateTo: '2017-10-01',
+        dateTo: '2017-08-31',
         timeFrom: '10:00',
         timeTo: '19:00',
         duration: 60,

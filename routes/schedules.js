@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const Schedule = require('../models/schedule');
-const Park = require('../models/park');
+const Schedule = require('../models/Schedule');
+const Ropeway = require('../models/Ropeway');
 
 router.param('id', (req, res, next, id) => {
     Schedule.findById(id, {
@@ -17,9 +17,7 @@ router.param('id', (req, res, next, id) => {
 });
 
 router.get('/', (req, res, next) => {
-    Schedule.findAll({
-        include: [{all: true}]
-    })
+    Schedule.findAll()
         .then(res.send.bind(res))
         .catch(next);
 });
@@ -29,10 +27,10 @@ router.get('/:id', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    Park.findById(req.body.parkId)
-        .then(park => {
-            if (park) {
-                park.createSchedule(req.body)
+    Ropeway.findById(req.body.ropewayId)
+        .then(ropeway => {
+            if (ropeway) {
+                ropeway.createSchedule(req.body)
                     .then(res.send.bind(res))
                     .catch(next)
             }
