@@ -127,7 +127,7 @@ const scheduleData = [
         timeTo: '20:00',
         duration: 60,
         interval: 15,
-        parkId: 1
+        ropewayId: 1
     },
     {
         dateFrom: '2017-06-01',
@@ -136,7 +136,7 @@ const scheduleData = [
         timeTo: '20:00',
         duration: 60,
         interval: 30,
-        parkId: 2
+        ropewayId: 2
     },
     {
         dateFrom: '2017-05-01',
@@ -145,7 +145,7 @@ const scheduleData = [
         timeTo: '20:00',
         duration: 60,
         interval: 60,
-        parkId: 3
+        ropewayId: 3
     },
     {
         dateFrom: '2017-05-01',
@@ -154,7 +154,16 @@ const scheduleData = [
         timeTo: '19:00',
         duration: 60,
         interval: 30,
-        parkId: 4
+        ropewayId: 4
+    },
+    {
+        dateFrom: '2017-05-01',
+        dateTo: '2017-10-01',
+        timeFrom: '10:00',
+        timeTo: '19:00',
+        duration: 60,
+        interval: 30,
+        ropewayId: 5
     }
 ];
 

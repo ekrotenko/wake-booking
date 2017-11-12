@@ -21,7 +21,8 @@ Ropeway.belongsTo(Park);
 Park.belongsToMany(User, {as: 'admin', through: 'parksUsers'});
 User.belongsToMany(Park, {as: 'ownedPark', through: 'parksUsers'});
 
-Park.hasOne(Schedule, {foreignKey: {name: 'parkId', allowNull: false}});
+Ropeway.hasMany(Schedule, {foreignKey: {allowNull: false}});
+// Park.hasOne(Schedule, {foreignKey: {name: 'parkId', allowNull: false}});
 
 Order.belongsTo(User, {foreignKey: {allowNull: false}});
 Order.belongsTo(Ropeway, {foreignKey: {allowNull: false}});

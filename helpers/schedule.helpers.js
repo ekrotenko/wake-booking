@@ -2,16 +2,16 @@ const Scheduler = require('@ssense/sscheduler').Scheduler;
 const scheduler = new Scheduler();
 
 const Ropeway = require('../models/Ropeway');
+const Order = require('../models/Order');
 
 const moment = require('moment');
 const timeFormat = 'HH:mm';
 const dateFormat = 'YYYY-MM-DD';
 
 class ScheduleHelpers {
-
     static getTimeSlots(date, ropewayId) {
         // TODO: fix issue Order.findAll is not a function when declaration of order is out of getTimeSlots()
-        const Order = require('../models/Order');
+
         return ScheduleHelpers.getRopewaySchedule(ropewayId)
             .then(schedule => {
                 if (!moment(date).isBetween(moment(schedule.dateFrom), moment(schedule.dateTo))) {
