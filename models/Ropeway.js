@@ -3,14 +3,14 @@ const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
 
 const Ropeway = db.define('ropeway', {
-    name:{
+    name: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
+        validate: {
             len: [3, 30]
         }
     },
-    description:{
+    description: {
         type: DataTypes.TEXT
     }
 }, {
