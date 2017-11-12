@@ -5,6 +5,7 @@ const db = require('../db');
 const Ropeway = db.define('ropeway', {
     name:{
         type: DataTypes.STRING,
+        allowNull: false,
         validate:{
             len: [3, 30]
         }

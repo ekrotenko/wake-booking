@@ -19,6 +19,10 @@ const Order = db.define('order', {
             notEmpty: true,
             isAfter: DataTypes.NOW
         }
+    },
+    status: {
+        type: DataTypes.ENUM(['pending', 'approved', 'declined']),
+
     }
 }, {
     paranoid: true

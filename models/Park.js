@@ -6,6 +6,7 @@ const Park = db.define('park', {
     name:{
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         validate:{
             len: [3, 30]
         }
@@ -48,7 +49,7 @@ const Park = db.define('park', {
         type: DataTypes.STRING,
         allowNull: false,
         validate:{
-            len: [5, 30],
+            len: [5, 50],
             isEmail: true
         }
     },
