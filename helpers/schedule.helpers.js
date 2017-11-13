@@ -85,15 +85,12 @@ class ScheduleHelpers {
 }
 
 function _getAllocations(orders) {
-    const allocations = [];
-    orders.forEach((order, index) => {
-        allocations[index] = {
+    return orders.map(order => {
+        return {
             from: `${order.date} ${order.startAt}`,
             duration: ScheduleHelpers.getDuration(order.startAt, order.endAt)
         }
     });
-
-    return allocations;
 }
 
 module.exports = ScheduleHelpers;

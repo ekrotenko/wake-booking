@@ -37,6 +37,11 @@ const ropewayData = [
         description: 'Right RP with wide slider and small kicker',
         parkId: 1
     },
+    {
+        name: 'Main',
+        description: 'Vertigo RP',
+        parkId: 4
+    },
 ];
 
 const userData = [
@@ -164,6 +169,15 @@ const scheduleData = [
         duration: 60,
         interval: 30,
         ropewayId: 5
+    },
+    {
+        dateFrom: '2017-09-01',
+        dateTo: '2017-11-30',
+        timeFrom: '16:00',
+        timeTo: '18:00',
+        duration: 60,
+        interval: 30,
+        ropewayId: 5
     }
 ];
 
@@ -241,6 +255,18 @@ const parkData = [
         phone: '0678467394',
         email: faker.internet.email(),
         website: 'http://bezlud.com.ua',
+        latitude: '2345463',
+        longitude: '3948578',
+    },
+    {
+        name: 'South Park',
+        country: 'Ukraine',
+        city: 'Kherson',
+        zipCode: '73000',
+        address: 'Kindiyskoe ave 145',
+        phone: '0668467394',
+        email: faker.internet.email(),
+        website: 'http://sp.com.ua',
         latitude: '2345463',
         longitude: '3948578',
     },

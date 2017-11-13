@@ -1,9 +1,9 @@
 const Sequelize = require('sequelize');
 
-const db = new Sequelize('wake_booking', 'root', 'j1l9k21988', {
+const db = new Sequelize('wake_booking', 'root', 'aaaaaaaa', {
     dialect: 'mysql',
     logging: false,
-    operatorsAliases: false,
+    operatorsAliases: Sequelize.Op
 });
 module.exports = db;
 
