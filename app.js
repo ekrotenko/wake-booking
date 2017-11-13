@@ -39,7 +39,8 @@ let server = app.listen(3000, () => {
         .then(() => {
             console.log('...DB is synced')
         })
-        .catch(function(error){
+        .catch(function (error) {
             throw error;
         });
 });
+

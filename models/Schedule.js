@@ -67,7 +67,7 @@ const Schedule = db.define('schedule', {
                             return moment(sc.dateFrom).isSameOrBefore(moment(this.dateFrom)) ||
                                 moment(sc.dateTo).isSameOrAfter(moment(this.dateTo));
                         });
-                        if(intersections.length){
+                        if (intersections.length) {
                             throw new Error('Schedule dates conflicts');
                         }
                     }

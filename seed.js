@@ -1,4 +1,3 @@
-
 // importing Bluebird promises so we can Promise.map
 const Promise = require('bluebird');
 // bring in the db and all the Models to seed
@@ -277,7 +276,7 @@ const parkData = [
 // for each element in the array. Look below for a commented out version of how to do this in one slick nested Promise.
 
 // Sync and restart db before seeding
-db.sync({ force: true })
+db.sync({force: true})
     .then(() => {
         console.log('synced DB and dropped old data');
     })
@@ -304,7 +303,7 @@ db.sync({ force: true })
     })
 
     .then(() => {
-        return Promise.map(ropewayData, function(ropeway) {
+        return Promise.map(ropewayData, function (ropeway) {
             return Ropeway.create(ropeway);
         })
     })
@@ -312,12 +311,12 @@ db.sync({ force: true })
         console.log(`${createdRopeways.length} ropeways created`);
     })
 
-    .then(()=>{
-        return Promise.map(scheduleData, function(schedule){
+    .then(() => {
+        return Promise.map(scheduleData, function (schedule) {
             return Schedule.create(schedule);
         })
     })
-    .then(createdSchedules=>{
+    .then(createdSchedules => {
         console.log(`${createdSchedules.length} schedules created`)
     })
 
@@ -333,32 +332,4 @@ db.sync({ force: true })
         return null;
     });
 
-// Nested version:
-// const allData = {
-//   location: locationData,
-//   puppy: puppyData,
-//   food: foodData,
-//   park: parkData,
-// }
 
-// db.sync({force: true})
-// .then(function () {
-//   console.log('synced DB and dropped old data');
-//   return Promise.map(Object.keys(allData), name => {
-//     return Promise.map(allData[name], element => {
-//       return db.model(name)
-//         .create(element);
-//     });
-//   });
-// })
-// .then(function () {
-//   console.log('Seeded successfully');
-// })
-// .catch(function(err) {
-//   console.error('Error!', err, err.stack);
-// })
-// .finally(function() {
-//   db.close();
-//   console.log('Finished!');
-//   return null;
-// })

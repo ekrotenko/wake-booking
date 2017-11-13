@@ -36,7 +36,7 @@ router.get('/available', (req, res, next) => {
 router.post('/', (req, res, next) => {
     Order.create(req.body)
         .then(res.send.bind(res))
-        .catch(er=>res.send(er.message));
+        .catch(er => res.send(er.message));
 });
 
 module.exports = router;

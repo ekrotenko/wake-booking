@@ -11,20 +11,20 @@ const Unavailability = Sequelize.define({
     from: {
         type: DataTypes.DATE,
         allowNull: false,
-        validate:{
+        validate: {
             isAfter: new Date()
         }
     },
     to: {
-    type: DataTypes.DATE,
+        type: DataTypes.DATE,
         allowNull: false,
-        validate:{
-        isAfter: new Date()
+        validate: {
+            isAfter: new Date()
+        }
     }
-}
 }, {
     paranoid: true,
-    validate:{
+    validate: {
         // TODO: Sync with schedule options
     }
 });
