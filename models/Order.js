@@ -64,7 +64,7 @@ const Order = db.define('order', {
                         }
                         if (moment(this.startAt, timeFormat).isBefore(moment(schedule.timeFrom, timeFormat)) ||
                             moment(this.endAt, timeFormat).isAfter(moment(schedule.timeTo, timeFormat))) {
-                            throw new Error('This time is out of park schedule');
+                            throw new Error('Start time or end time is out of park schedule');
                         }
                     })
             },

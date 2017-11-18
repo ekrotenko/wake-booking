@@ -16,6 +16,7 @@
     "morgan": "~1.8.1",
     "mysql": "^2.14.1",
     "mysql2": "^1.4.2",
+    "nconf": "^0.9.1",
     "nodemon": "^1.12.1",
     "sequelize": "^4.11.4",
     "serve-favicon": "~2.4.2",

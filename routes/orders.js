@@ -30,13 +30,13 @@ router.get('/available', (req, res, next) => {
         .then(slots => {
             res.send(slots);
         })
-        .catch(er => res.send(er.message));
+        .catch(next);
 });
 
 router.post('/', (req, res, next) => {
     Order.create(req.body)
         .then(res.send.bind(res))
-        .catch(er => res.send(er.message));
+        .catch(next);
 });
 
 module.exports = router;

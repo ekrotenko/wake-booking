@@ -72,7 +72,7 @@ class ScheduleHelpers {
         })
             .then(schedule => {
                 if (!schedule) {
-                    throw new Error('Ropeway is not available on this date');
+                    return new Error('Ropeway is not available on this date');
                 }
                 return schedule;
             });
