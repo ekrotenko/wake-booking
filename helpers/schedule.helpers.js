@@ -10,13 +10,14 @@ const timeFormat = 'HH:mm';
 const dateFormat = 'YYYY-MM-DD';
 
 class ScheduleHelpers {
-    static getTimeSlots(date, ropewayId) {
+    static getTimeSlots(ropewayId, date) {
         const Order = require('../models/Order');
         return ScheduleHelpers.getRopewaySchedule(ropewayId, date)
             .then(schedule => {
-                if (!moment(date).isBetween(moment(schedule.dateFrom), moment(schedule.dateTo))) {
-                    throw new Error('Ropeway is not available on this date');
-                }
+                // FIXME: redundant ??
+                // if (!moment(date).isBetween(moment(schedule.dateFrom), moment(schedule.dateTo))) {
+                //     throw new Error('Ropeway is not available on this date))))))');
+                // }
                 return Order.findAll({
                     where: {
                         date: date,
@@ -72,7 +73,7 @@ class ScheduleHelpers {
         })
             .then(schedule => {
                 if (!schedule) {
-                    return new Error('Ropeway is not available on this date');
+                    throw new Error('Ropeway is not available on this date');
                 }
                 return schedule;
             });

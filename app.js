@@ -33,7 +33,12 @@ app.use('*', (req, res, next) => {
     res.send('This is default route')
 });
 app.use((err, req, res, next) => {
-    res.status(500).send(err.message);
+    if (err.name === 'SequelizeValidationError') {
+        res.status(422).send(err.message);
+    }
+    else {
+        res.status(err.status).send(err.message);
+    }
     next();
 });
 
