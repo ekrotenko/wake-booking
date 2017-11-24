@@ -12,7 +12,7 @@ const Order = db.define('order', {
             type: DataTypes.DATEONLY,
             notNull: false,
             validate: {
-                isSameOrAfter(){
+                isSameOrAfter() {
                     if (!moment(this.date).isSameOrAfter(moment().format(dateFormat))) {
                         throw new Error('This date is in past');
                     }
@@ -54,8 +54,9 @@ const Order = db.define('order', {
     {
         paranoid: true,
         validate: {
+            // TODO: Do not validate if first validation fails
             verifyScheduleOptions() {
-                return SchedulerHelpers.getRopewaySchedule(this.ropewayId)
+                return SchedulerHelpers.getRopewaySchedule(this.ropewayId, this.date)
                     .then(schedule => {
                         const slotDuration = SchedulerHelpers.getDuration(this.startAt, this.endAt);
                         if (slotDuration % schedule.duration > 0) {
@@ -70,7 +71,7 @@ const Order = db.define('order', {
             verifyTimeSlot() {
                 return SchedulerHelpers.getTimeSlots(this.date, this.ropewayId)
                     .then(allSlots => {
-                        if(!allSlots.find(slot=>slot.time===this.startAt)) {
+                        if (!allSlots.find(slot => slot.time === this.startAt)) {
                             throw new Error('Schedule interval mismatch');
                         }
 

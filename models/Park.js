@@ -3,67 +3,67 @@ const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
 
 const Park = db.define('park', {
-    name:{
+    name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-        validate:{
+        validate: {
             len: [3, 30]
         }
 
     },
-    country:{
+    country: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
+        validate: {
             len: [3, 30]
         }
     },
-    city:{
+    city: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
+        validate: {
             len: [3, 30]
         }
     },
-    zipCode:{
+    zipCode: {
         type: DataTypes.STRING,
-        validate:{
+        validate: {
             len: [5, 9]
         }
     },
-    address:{
+    address: {
         type: DataTypes.STRING,
-        validate:{
+        validate: {
             len: [3, 30]
         }
     },
-    phone:{
+    phone: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
+        validate: {
             len: [3, 30]
         }
     },
-    email:{
+    email: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
+        validate: {
             len: [5, 50],
             isEmail: true
         }
     },
-    website:{
+    website: {
         type: DataTypes.STRING,
-        validate:{
+        validate: {
             len: [3, 30],
             isUrl: true
         }
     },
-    latitude:{
+    latitude: {
         type: DataTypes.STRING
     },
-    longitude:{
+    longitude: {
         type: DataTypes.STRING
     }
 }, {

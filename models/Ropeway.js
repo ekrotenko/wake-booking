@@ -14,7 +14,7 @@ const Ropeway = db.define('ropeway', {
         type: DataTypes.TEXT
     }
 }, {
-    paranoid: true
+    paranoid: true,
 });
 
 module.exports = Ropeway;

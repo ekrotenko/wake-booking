@@ -1,21 +1,21 @@
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const Scheduler = require('@ssense/sscheduler').Scheduler;
 const scheduler = new Scheduler();
 
-const Ropeway = require('../models/Ropeway');
+const Schedule = require('../models/Schedule');
 
 const moment = require('moment');
 const timeFormat = 'HH:mm';
 const dateFormat = 'YYYY-MM-DD';
 
 class ScheduleHelpers {
-
     static getTimeSlots(date, ropewayId) {
-        // TODO: fix issue Order.findAll is not a function when declaration of order is out of getTimeSlots()
         const Order = require('../models/Order');
-        return ScheduleHelpers.getRopewaySchedule(ropewayId)
+        return ScheduleHelpers.getRopewaySchedule(ropewayId, date)
             .then(schedule => {
                 if (!moment(date).isBetween(moment(schedule.dateFrom), moment(schedule.dateTo))) {
-                    throw new Error('Park is not available on this date');
+                    throw new Error('Ropeway is not available on this date');
                 }
                 return Order.findAll({
                     where: {
@@ -57,10 +57,25 @@ class ScheduleHelpers {
             });
     }
 
-    static getRopewaySchedule(ropewayId) {
-        return Ropeway.findById(ropewayId)
-            .then(ropeway => ropeway.getPark())
-            .then(park => park.getSchedule());
+    static getRopewaySchedule(ropewayId, date) {
+        return Schedule.findOne({
+            where:
+                {
+                    dateFrom: {
+                        [Op.lt]: new Date(date)
+                    },
+                    dateTo: {
+                        [Op.gte]: new Date(date)
+                    },
+                    ropewayId: ropewayId
+                }
+        })
+            .then(schedule => {
+                if (!schedule) {
+                    throw new Error('Ropeway is not available on this date');
+                }
+                return schedule;
+            });
     }
 
     static getDuration(from, to) {
@@ -70,15 +85,12 @@ class ScheduleHelpers {
 }
 
 function _getAllocations(orders) {
-    const allocations = [];
-    orders.forEach((order, index) => {
-        allocations[index] = {
+    return orders.map(order => {
+        return {
             from: `${order.date} ${order.startAt}`,
             duration: ScheduleHelpers.getDuration(order.startAt, order.endAt)
         }
     });
-
-    return allocations;
 }
 
 module.exports = ScheduleHelpers;

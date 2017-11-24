@@ -1,4 +1,3 @@
-
 // importing Bluebird promises so we can Promise.map
 const Promise = require('bluebird');
 // bring in the db and all the Models to seed
@@ -36,6 +35,11 @@ const ropewayData = [
         name: 'Right',
         description: 'Right RP with wide slider and small kicker',
         parkId: 1
+    },
+    {
+        name: 'Main',
+        description: 'Vertigo RP',
+        parkId: 4
     },
 ];
 
@@ -127,7 +131,7 @@ const scheduleData = [
         timeTo: '20:00',
         duration: 60,
         interval: 15,
-        parkId: 1
+        ropewayId: 1
     },
     {
         dateFrom: '2017-06-01',
@@ -136,7 +140,7 @@ const scheduleData = [
         timeTo: '20:00',
         duration: 60,
         interval: 30,
-        parkId: 2
+        ropewayId: 2
     },
     {
         dateFrom: '2017-05-01',
@@ -145,7 +149,7 @@ const scheduleData = [
         timeTo: '20:00',
         duration: 60,
         interval: 60,
-        parkId: 3
+        ropewayId: 3
     },
     {
         dateFrom: '2017-05-01',
@@ -154,7 +158,25 @@ const scheduleData = [
         timeTo: '19:00',
         duration: 60,
         interval: 30,
-        parkId: 4
+        ropewayId: 4
+    },
+    {
+        dateFrom: '2017-05-01',
+        dateTo: '2017-08-31',
+        timeFrom: '10:00',
+        timeTo: '19:00',
+        duration: 60,
+        interval: 30,
+        ropewayId: 5
+    },
+    {
+        dateFrom: '2017-09-01',
+        dateTo: '2017-11-30',
+        timeFrom: '16:00',
+        timeTo: '18:00',
+        duration: 60,
+        interval: 30,
+        ropewayId: 5
     }
 ];
 
@@ -235,6 +257,18 @@ const parkData = [
         latitude: '2345463',
         longitude: '3948578',
     },
+    {
+        name: 'South Park',
+        country: 'Ukraine',
+        city: 'Kherson',
+        zipCode: '73000',
+        address: 'Kindiyskoe ave 145',
+        phone: '0668467394',
+        email: faker.internet.email(),
+        website: 'http://sp.com.ua',
+        latitude: '2345463',
+        longitude: '3948578',
+    },
 ];
 
 
@@ -242,7 +276,7 @@ const parkData = [
 // for each element in the array. Look below for a commented out version of how to do this in one slick nested Promise.
 
 // Sync and restart db before seeding
-db.sync({ force: true })
+db.sync({force: true})
     .then(() => {
         console.log('synced DB and dropped old data');
     })
@@ -269,7 +303,7 @@ db.sync({ force: true })
     })
 
     .then(() => {
-        return Promise.map(ropewayData, function(ropeway) {
+        return Promise.map(ropewayData, function (ropeway) {
             return Ropeway.create(ropeway);
         })
     })
@@ -277,12 +311,12 @@ db.sync({ force: true })
         console.log(`${createdRopeways.length} ropeways created`);
     })
 
-    .then(()=>{
-        return Promise.map(scheduleData, function(schedule){
+    .then(() => {
+        return Promise.map(scheduleData, function (schedule) {
             return Schedule.create(schedule);
         })
     })
-    .then(createdSchedules=>{
+    .then(createdSchedules => {
         console.log(`${createdSchedules.length} schedules created`)
     })
 
@@ -298,32 +332,4 @@ db.sync({ force: true })
         return null;
     });
 
-// Nested version:
-// const allData = {
-//   location: locationData,
-//   puppy: puppyData,
-//   food: foodData,
-//   park: parkData,
-// }
 
-// db.sync({force: true})
-// .then(function () {
-//   console.log('synced DB and dropped old data');
-//   return Promise.map(Object.keys(allData), name => {
-//     return Promise.map(allData[name], element => {
-//       return db.model(name)
-//         .create(element);
-//     });
-//   });
-// })
-// .then(function () {
-//   console.log('Seeded successfully');
-// })
-// .catch(function(err) {
-//   console.error('Error!', err, err.stack);
-// })
-// .finally(function() {
-//   db.close();
-//   console.log('Finished!');
-//   return null;
-// })
