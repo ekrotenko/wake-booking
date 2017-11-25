@@ -44,7 +44,7 @@ app.use((err, req, res, next) => {
 
 
 let server = app.listen(config.get('port'), () => {
-    console.log('Listening on port ', server.address().port);
+    console.log('Listening on port:', server.address().port);
     db.sync({force: false})
         .then(() => {
             console.log('...DB is synced')
