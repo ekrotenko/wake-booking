@@ -1,4 +1,4 @@
-const ScheduleHelpers = require('../helpers/schedule.helpers');
+const ScheduleHelpers = require('../libs/schedule.helpers');
 const router = require('express').Router();
 const Order = require('../models/Order');
 

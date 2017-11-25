@@ -1,4 +1,4 @@
-const SchedulerHelpers = require('../helpers/schedule.helpers');
+const SchedulerHelpers = require('../libs/schedule.helpers');
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 
