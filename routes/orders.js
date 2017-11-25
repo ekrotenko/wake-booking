@@ -36,8 +36,13 @@ router.get('/available', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    Order.create(req.body)
-        .then(res.send.bind(res))
+    ScheduleHelpers.getRopewaySchedule(req.body.ropewayId, req.body.date)
+        .then(schedule => {
+            req.body.schedule = schedule;
+            Order.create(req.body)
+                .then(res.send.bind(res))
+                .catch(next);
+        })
         .catch(next);
 });
 

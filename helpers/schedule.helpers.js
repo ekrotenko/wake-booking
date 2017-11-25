@@ -4,58 +4,51 @@ const Scheduler = require('@ssense/sscheduler').Scheduler;
 const scheduler = new Scheduler();
 
 const Schedule = require('../models/Schedule');
+const Order = require('../models/Order');
 
 const moment = require('moment');
 const timeFormat = 'HH:mm';
 const dateFormat = 'YYYY-MM-DD';
 
 class ScheduleHelpers {
-    static getTimeSlots(ropewayId, date) {
-        const Order = require('../models/Order');
-        return ScheduleHelpers.getRopewaySchedule(ropewayId, date)
-            .then(schedule => {
-                // FIXME: redundant ??
-                // if (!moment(date).isBetween(moment(schedule.dateFrom), moment(schedule.dateTo))) {
-                //     throw new Error('Ropeway is not available on this date))))))');
-                // }
-                return Order.findAll({
-                    where: {
-                        date: date,
-                        ropewayId: ropewayId
+    static getTimeSlots(ropewayId, date, schedule) {
+        return Order.findAll({
+            where: {
+                date: date,
+                ropewayId: ropewayId
+            }
+        })
+            .then(orders => {
+                const timeSettings = {
+                    from: date,
+                    to: moment(date).add(1, 'days').format(dateFormat),
+                    duration: schedule.duration,
+                    interval: schedule.interval,
+                    schedule: {
+                        weekdays: {
+                            from: schedule.timeFrom,
+                            to: schedule.timeTo,
+                            // TODO: implement unavailabilities of park
+                            // unavailability: [
+                            //     {
+                            //         from: rSchedule.breakFrom,
+                            //         to: rSchedule.breakTo
+                            //     }
+                            // ]
+                        },
+                        saturday: {
+                            from: schedule.timeFrom,
+                            to: schedule.timeTo,
+                        },
+                        sunday: {
+                            from: schedule.timeFrom,
+                            to: schedule.timeTo,
+                        },
+                        allocated: _getAllocations(orders)
                     }
-                })
-                    .then(orders => {
-                        const timeSettings = {
-                            from: date,
-                            to: moment(date).add(1, 'days').format(dateFormat),
-                            duration: schedule.duration,
-                            interval: schedule.interval,
-                            schedule: {
-                                weekdays: {
-                                    from: schedule.timeFrom,
-                                    to: schedule.timeTo,
-                                    // TODO: implement unavailabilities of park
-                                    // unavailability: [
-                                    //     {
-                                    //         from: rSchedule.breakFrom,
-                                    //         to: rSchedule.breakTo
-                                    //     }
-                                    // ]
-                                },
-                                saturday: {
-                                    from: schedule.timeFrom,
-                                    to: schedule.timeTo,
-                                },
-                                sunday: {
-                                    from: schedule.timeFrom,
-                                    to: schedule.timeTo,
-                                },
-                                allocated: _getAllocations(orders)
-                            }
-                        };
-                        return scheduler.getAvailability(timeSettings)[`${date}`];
-                    })
-            });
+                };
+                return scheduler.getAvailability(timeSettings)[`${date}`];
+            })
     }
 
     static getRopewaySchedule(ropewayId, date) {
@@ -73,7 +66,9 @@ class ScheduleHelpers {
         })
             .then(schedule => {
                 if (!schedule) {
-                    throw new Error('Ropeway is not available on this date');
+                    const error = new Error('Ropeway is not available on this date');
+                    error.status = 422;
+                    throw error;
                 }
                 return schedule;
             });

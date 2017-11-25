@@ -50,32 +50,28 @@ const Order = db.define('order', {
             defaultValue: 'pending',
             allowNull: false
         },
+        schedule: {
+            type: DataTypes.VIRTUAL
+        }
     },
     {
         paranoid: true,
         validate: {
-            // TODO: Call getRopewaySchedule once!!!
             verifyScheduleRange() {
-                return SchedulerHelpers.getRopewaySchedule(this.ropewayId, this.date)
-                    .then(schedule => {
-                        if (moment(this.startAt, timeFormat).isBefore(moment(schedule.timeFrom, timeFormat)) ||
-                            moment(this.endAt, timeFormat).isAfter(moment(schedule.timeTo, timeFormat))) {
-                            throw new Error('Start/end time is out of park schedule');
-                        }
-                    });
+                if (moment(this.startAt, timeFormat).isBefore(moment(this.schedule.timeFrom, timeFormat)) ||
+                    moment(this.endAt, timeFormat).isAfter(moment(this.schedule.timeTo, timeFormat))) {
+                    throw new Error('Start/end time is out of park schedule');
+                }
             },
             verifyDuration() {
                 const slotDuration = SchedulerHelpers.getDuration(this.startAt, this.endAt);
-                return SchedulerHelpers.getRopewaySchedule(this.ropewayId, this.date)
-                    .then(schedule => {
 
-                        if (slotDuration % schedule.duration > 0) {
-                            throw new Error(`Duration should be a multiple of ${schedule.duration} minutes`);
-                        }
-                    })
+                if (slotDuration % this.schedule.duration > 0) {
+                    throw new Error(`Duration should be a multiple of ${this.schedule.duration} minutes`);
+                }
             },
             verifyTimeSlot() {
-                return SchedulerHelpers.getTimeSlots(this.ropewayId, this.date)
+                return SchedulerHelpers.getTimeSlots(this.ropewayId, this.date, this.schedule)
                     .then(allSlots => {
                         if (!allSlots.find(slot => slot.time === this.startAt)) {
                             throw new Error('Schedule interval mismatch');
