@@ -14,8 +14,8 @@ class ScheduleHelpers {
     static getTimeSlots(ropewayId, date, schedule) {
         return Order.findAll({
             where: {
-                date: date,
-                ropewayId: ropewayId
+                date: {[Op.eq]: date},
+                ropewayId: {[Op.eq]: ropewayId}
             }
         })
             .then(orders => {
@@ -55,13 +55,9 @@ class ScheduleHelpers {
         return Schedule.findOne({
             where:
                 {
-                    dateFrom: {
-                        [Op.lt]: new Date(date)
-                    },
-                    dateTo: {
-                        [Op.gte]: new Date(date)
-                    },
-                    ropewayId: ropewayId
+                    dateFrom: {[Op.lt]: new Date(date)},
+                    dateTo: {[Op.gte]: new Date(date)},
+                    ropewayId: {[Op.eq]: ropewayId}
                 }
         })
             .then(schedule => {

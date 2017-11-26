@@ -60,7 +60,9 @@ const Schedule = db.define('schedule', {
     paranoid: true,
     validate: {
         isIntersected() {
-            return Schedule.findAll({where: {ropewayId: this.ropewayId}})
+            return Schedule.findAll({
+                where: {ropewayId: {[Op.eq]: this.ropewayId}}
+            })
                 .then(schedules => {
                     if (schedules.length) {
                         const intersections = schedules.filter(sc => {
