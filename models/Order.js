@@ -1,4 +1,4 @@
-const SchedulerHelpers = require('../helpers/schedule.helpers');
+const SchedulerHelpers = require('../libs/schedule.helpers');
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 
@@ -28,7 +28,7 @@ const Order = db.define('order', {
                     const curTime = moment().format(timeFormat);
                     if (moment(moment().format(dateFormat)).isSame(this.date) &&
                         moment(curTime, timeFormat).isSameOrAfter(moment(this.startAt, timeFormat))) {
-                        throw new Error('This time is in past');
+                        throw new Error('Start time is in past');
                     }
                 }
             }
@@ -40,7 +40,7 @@ const Order = db.define('order', {
                 notEmpty: true,
                 isAfterStartTime() {
                     if (moment(this.endAt, timeFormat).isSameOrBefore(moment(this.startAt, timeFormat))) {
-                        throw new Error('End time is not valid');
+                        throw new Error('End time can not be same or before start time');
                     }
                 }
             }
@@ -49,27 +49,29 @@ const Order = db.define('order', {
             type: DataTypes.ENUM(['pending', 'approved', 'declined', 'overdue']),
             defaultValue: 'pending',
             allowNull: false
+        },
+        schedule: {
+            type: DataTypes.VIRTUAL
         }
     },
     {
         paranoid: true,
         validate: {
-            // TODO: Do not validate if first validation fails
-            verifyScheduleOptions() {
-                return SchedulerHelpers.getRopewaySchedule(this.ropewayId, this.date)
-                    .then(schedule => {
-                        const slotDuration = SchedulerHelpers.getDuration(this.startAt, this.endAt);
-                        if (slotDuration % schedule.duration > 0) {
-                            throw new Error(`Duration should be a multiple of ${schedule.duration} minutes`);
-                        }
-                        if (moment(this.startAt, timeFormat).isBefore(moment(schedule.timeFrom, timeFormat)) ||
-                            moment(this.endAt, timeFormat).isAfter(moment(schedule.timeTo, timeFormat))) {
-                            throw new Error('This time is out of park schedule');
-                        }
-                    })
+            verifyScheduleRange() {
+                if (moment(this.startAt, timeFormat).isBefore(moment(this.schedule.timeFrom, timeFormat)) ||
+                    moment(this.endAt, timeFormat).isAfter(moment(this.schedule.timeTo, timeFormat))) {
+                    throw new Error('Start/end time is out of park schedule');
+                }
+            },
+            verifyDuration() {
+                const slotDuration = SchedulerHelpers.getDuration(this.startAt, this.endAt);
+
+                if (slotDuration % this.schedule.duration > 0) {
+                    throw new Error(`Duration should be a multiple of ${this.schedule.duration} minutes`);
+                }
             },
             verifyTimeSlot() {
-                return SchedulerHelpers.getTimeSlots(this.date, this.ropewayId)
+                return SchedulerHelpers.getTimeSlots(this.ropewayId, this.date, this.schedule)
                     .then(allSlots => {
                         if (!allSlots.find(slot => slot.time === this.startAt)) {
                             throw new Error('Schedule interval mismatch');

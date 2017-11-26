@@ -1,4 +1,4 @@
-const ScheduleHelpers = require('../helpers/schedule.helpers');
+const ScheduleHelpers = require('../libs/schedule.helpers');
 const router = require('express').Router();
 const Order = require('../models/Order');
 
@@ -9,7 +9,7 @@ router.param('id', (req, res, next, id) => [
                 req.order = order;
                 next();
             }
-            else res.sendStatus(404);
+            else res.status(404).send('Order not found');
         })
         .catch(next)
 ]);
@@ -24,19 +24,26 @@ router.get('/available', (req, res, next) => {
     const date = req.query.date;
     const ropewayId = req.query.ropewayId;
     if (!date || !ropewayId) {
-        res.sendStatus(404);
+        const error = new Error('Date and ropeway id are required');
+        error.status = 400;
+        throw error;
     }
     ScheduleHelpers.getTimeSlots(date, ropewayId)
         .then(slots => {
             res.send(slots);
         })
-        .catch(er => res.send(er.message));
+        .catch(next);
 });
 
 router.post('/', (req, res, next) => {
-    Order.create(req.body)
-        .then(res.send.bind(res))
-        .catch(er => res.send(er.message));
+    ScheduleHelpers.getRopewaySchedule(req.body.ropewayId, req.body.date)
+        .then(schedule => {
+            req.body.schedule = schedule;
+            Order.create(req.body)
+                .then(res.send.bind(res))
+                .catch(next);
+        })
+        .catch(next);
 });
 
 module.exports = router;

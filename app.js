@@ -2,6 +2,7 @@ const express = require('express');
 const volleyball = require('volleyball');
 const bodyParser = require('body-parser');
 const path = require('path');
+const config = require('./config');
 
 const db = require('./db');
 // Routers:
@@ -19,6 +20,7 @@ app.use(volleyball);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+
 app.use(express.static(path.join(__dirname, 'public')));
 // Using routers:
 app.use('/parks', parksRouter);
@@ -27,14 +29,20 @@ app.use('/ropeways', ropewaysRouter);
 app.use('/orders', ordersRouter);
 app.use('/schedules', schedules);
 
-
 app.use('*', (req, res, next) => {
     res.send('This is default route')
 });
+app.use((err, req, res, next) => {
+    if (err.name === 'SequelizeValidationError') {
+        err.status = 422;
+    }
+    res.status(err.status || 500).send(err.message);
+    next();
+});
 
 
-let server = app.listen(3000, () => {
-    console.log('Listening on port ', server.address().port);
+let server = app.listen(config.get('port'), () => {
+    console.log('Listening on port:', server.address().port);
     db.sync({force: false})
         .then(() => {
             console.log('...DB is synced')

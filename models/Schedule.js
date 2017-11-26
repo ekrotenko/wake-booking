@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const moment = require('moment');
 const DataTypes = Sequelize.DataTypes;
+const Op = Sequelize.Op;
 const db = require('../db');
 // TODO: add order add/cancel time options
 const Schedule = db.define('schedule', {
@@ -60,7 +61,9 @@ const Schedule = db.define('schedule', {
     paranoid: true,
     validate: {
         isIntersected() {
-            return Schedule.findAll({where: {ropewayId: this.ropewayId}})
+            return Schedule.findAll({
+                where: {ropewayId: {[Op.eq]: this.ropewayId}}
+            })
                 .then(schedules => {
                     if (schedules.length) {
                         const intersections = schedules.filter(sc => {
@@ -68,7 +71,7 @@ const Schedule = db.define('schedule', {
                                 moment(sc.dateTo).isSameOrAfter(moment(this.dateTo));
                         });
                         if (intersections.length) {
-                            throw new Error('Schedule dates conflicts');
+                            throw new Error('Schedule dates conflict');
                         }
                     }
                 })
