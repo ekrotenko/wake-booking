@@ -34,11 +34,9 @@ app.use('*', (req, res, next) => {
 });
 app.use((err, req, res, next) => {
     if (err.name === 'SequelizeValidationError') {
-        res.status(422).send(err.message);
+        err.status = 422;
     }
-    else {
-        res.status(err.status).send(err.message);
-    }
+    res.status(err.status || 500).send(err.message);
     next();
 });
 
