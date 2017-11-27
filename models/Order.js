@@ -59,6 +59,13 @@ const Order = db.define('order', {
     },
     {
         paranoid: true,
+        hooks: {
+            beforeCreate: (order, options) => {
+                order.schedule = undefined;
+                order.blockers = undefined;
+            }
+
+        },
         validate: {
             verifyScheduleRange() {
                 if (moment(this.startAt, timeFormat).isBefore(moment(this.schedule.timeFrom, timeFormat)) ||

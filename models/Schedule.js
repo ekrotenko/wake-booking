@@ -21,14 +21,6 @@ const Schedule = db.define('schedule', {
         type: DataTypes.TIME,
         allowNull: false
     },
-    breakFrom: {
-        type: DataTypes.TIME,
-        allowNull: true
-    },
-    breakTo: {
-        type: DataTypes.TIME,
-        allowNull: true
-    },
     duration: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -55,6 +47,15 @@ const Schedule = db.define('schedule', {
                     throw new Error('Should be multiple of 5 minutes')
                 }
             }
+        }
+    },
+    weekMask: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 127,
+        validate: {
+            min: 0,
+            max: 127,
         }
     }
 }, {

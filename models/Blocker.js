@@ -54,6 +54,8 @@ const Blocker = db.define('blocker', {
         allowNull: false,
         defaultValue: 0,
         validate: {
+            min: 0,
+            max: 127,
             isWeekMask() {
                 const isValid = (this.type === 'recurring' && this.weekMask >= 1 && this.weekMask <= 127)
                     || (this.type === 'disposable' && this.weekMask === 0);

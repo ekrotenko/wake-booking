@@ -132,7 +132,8 @@ const scheduleData = [
         timeTo: '20:00',
         duration: 60,
         interval: 15,
-        ropewayId: 1
+        ropewayId: 1,
+        weekMask: 127
     },
     {
         dateFrom: '2017-06-01',
@@ -209,12 +210,12 @@ const orderData = [
     },
 ];
 
-const unData = [
+const blockersData = [
     {
         name: 'service',
         type: 'disposable',
         dateFrom: '2017-11-29',
-        dateTo: '2017-11-30',
+        dateTo: '2017-11-29',
         timeFrom: ' 09:00',
         timeTo: ' 13:00',
         ropewayId: 5,
@@ -343,7 +344,7 @@ db.sync({force: true})
         console.log(`${createdSchedules.length} schedules created`)
     })
     .then(() => {
-        return Promise.map(unData, un => Blocker.create(un))
+        return Promise.map(blockersData, un => Blocker.create(un))
     })
     .then(createdUns => {
         console.log(`${createdUns.length} unavailabilities created`);

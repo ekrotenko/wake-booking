@@ -13,6 +13,20 @@ const dateFormat = 'YYYY-MM-DD';
 class ScheduleHelpers {
 
     static getTimeSlots(reqOrder) {
+        return ScheduleHelpers.configureSchedule(reqOrder).then(schedule => {
+            const timeSettings = {
+                from: reqOrder.date,
+                to: moment(reqOrder.date).add(1, 'days').format(dateFormat),
+                duration: reqOrder.schedule.duration,
+                interval: reqOrder.schedule.interval,
+                schedule
+            };
+
+            return scheduler.getAvailability(timeSettings)[`${reqOrder.date}`];
+        });
+    }
+
+    static configureSchedule(reqOrder) {
         const Order = require('../models/Order');
 
         return Order.findAll({
@@ -22,37 +36,14 @@ class ScheduleHelpers {
             }
         })
             .then(orders => {
-                const timeSettings = {
-                    from: reqOrder.date,
-                    to: moment(reqOrder.date).add(1, 'days').format(dateFormat),
-                    duration: reqOrder.schedule.duration,
-                    interval: reqOrder.schedule.interval,
-                    schedule: {
-                        weekdays: {
-                            from: reqOrder.schedule.timeFrom,
-                            to: reqOrder.schedule.timeTo,
-                            // TODO: implement unavailabilities of park
-                            // unavailability: [
-                            //     {
-                            //         from: rSchedule.breakFrom,
-                            //         to: rSchedule.breakTo
-                            //     }
-                            // ]
-                        },
-                        saturday: {
-                            from: reqOrder.schedule.timeFrom,
-                            to: reqOrder.schedule.timeTo,
-                        },
-                        sunday: {
-                            from: reqOrder.schedule.timeFrom,
-                            to: reqOrder.schedule.timeTo,
-                        },
-                        allocated: _getAllocations(orders),
-                        unavailability: reqOrder.blockers.disposable,
-                    }
-                };
+                const schedule = _parseScheduleWeekMask(reqOrder.schedule);
+                for (let key in schedule) {
+                    schedule[key].unavailability = reqOrder.blockers.recurring[`${key}`];
+                }
+                schedule.allocated = _getAllocations(orders);
+                schedule.unavailability = reqOrder.blockers.disposable;
 
-                return scheduler.getAvailability(timeSettings)[`${reqOrder.date}`];
+                return schedule;
             });
     }
 
@@ -77,7 +68,7 @@ class ScheduleHelpers {
                         blockersFiltered.recurring.push(un);
                     }
                 });
-                blockersFiltered.recurring = _parseRecurrings(blockersFiltered.recurring);
+                blockersFiltered.recurring = _parseRecurringWeekMask(blockersFiltered.recurring);
 
                 return blockersFiltered;
             })
@@ -119,32 +110,52 @@ function _getAllocations(orders) {
     });
 }
 
-function _parseRecurrings(recurrings) {
-    const blockers = {};
-    recurrings.forEach(rec => {
-        let mask = (rec.weekMask).toString(2);
+function _parseRecurringWeekMask(scheduleSettings) {
+    const parseResult = {};
+    scheduleSettings.forEach(setting => {
+        let mask = (setting.weekMask).toString(2);
         let emptyDays = 7 - mask.length;
-        if (emptyDays > 0) {
-            while (emptyDays > 0) {
-                mask = 0 + mask;
-                emptyDays--;
-            }
+        while (emptyDays > 0) {
+            mask = 0 + mask;
+            emptyDays--;
         }
         mask = mask.split('');
         mask.forEach((day, index) => {
-            // TODO: Add day anyway
-            if (day > 0) {
-                const weekDay = moment.weekdays(index).toLowerCase();
-                blockers[`${weekDay}`] = (!blockers[`${weekDay}`]) ? [] : blockers[`${weekDay}`]
-                blockers[`${weekDay}`].push({
-                    from: rec.timeFrom,
-                    to: rec.timeTo
+            const weekDay = moment.weekdays(index).toLowerCase();
+            parseResult[`${weekDay}`] = (!parseResult[`${weekDay}`]) ? [] : parseResult[`${weekDay}`];
+            if (day == 1) {
+                parseResult[`${weekDay}`].push({
+                    from: moment(setting.timeFrom, 'hh:mm:ss').format(timeFormat),
+                    to: moment(setting.timeTo, 'hh:mm:ss').format(timeFormat)
                 })
             }
         })
     });
 
-    return blockers;
+    return parseResult;
+}
+
+function _parseScheduleWeekMask(schedule) {
+    const parseResult = {};
+    let mask = (schedule.weekMask).toString(2);
+    let emptyDays = 7 - mask.length;
+    while (emptyDays > 0) {
+        mask = 0 + mask;
+        emptyDays--;
+    }
+    mask = mask.split('');
+    mask.forEach((day, index) => {
+        const weekDay = moment.weekdays(index).toLowerCase();
+        if (day > 0) {
+            parseResult[`${weekDay}`] = {
+                from: schedule.timeFrom,
+                to: schedule.timeTo,
+            }
+        }
+    });
+
+    return parseResult;
+
 }
 
 module.exports = ScheduleHelpers;
