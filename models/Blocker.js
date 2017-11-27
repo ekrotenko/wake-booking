@@ -21,7 +21,7 @@ const Blocker = db.define('blocker', {
         allowNull: false,
         defaultValue: 'disposable',
     },
-    dateFrom:{
+    dateFrom: {
         type: DataTypes.DATEONLY,
         allowNull: false,
         validate: {
@@ -47,6 +47,20 @@ const Blocker = db.define('blocker', {
         allowNull: false,
         validate: {
             // isAfter: new Date()
+        }
+    },
+    weekMask: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            isWeekMask() {
+                const isValid = (this.type === 'recurring' && this.weekMask >= 1 && this.weekMask <= 127)
+                    || (this.type === 'disposable' && this.weekMask === 0);
+                if (!isValid) {
+                    throw new Error('Not valid week mask');
+                }
+            }
         }
     }
 }, {

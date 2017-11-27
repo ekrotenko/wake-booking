@@ -217,7 +217,7 @@ const unData = [
         dateTo: '2017-11-30',
         timeFrom: ' 09:00',
         timeTo: ' 13:00',
-        ropewayId: 5
+        ropewayId: 5,
     },
     {
         name: 'morning abons',
@@ -226,7 +226,8 @@ const unData = [
         dateTo: '2017-12-31',
         timeFrom: ' 09:00',
         timeTo: ' 11:00',
-        ropewayId: 5
+        ropewayId: 5,
+        weekMask: 62,
     },
 ];
 
