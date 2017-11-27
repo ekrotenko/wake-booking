@@ -52,6 +52,9 @@ const Order = db.define('order', {
         },
         schedule: {
             type: DataTypes.VIRTUAL
+        },
+        blockers: {
+            type: DataTypes.VIRTUAL
         }
     },
     {
@@ -71,7 +74,7 @@ const Order = db.define('order', {
                 }
             },
             verifyTimeSlot() {
-                return SchedulerHelpers.getTimeSlots(this.ropewayId, this.date, this.schedule)
+                return SchedulerHelpers.getTimeSlots(this)
                     .then(allSlots => {
                         if (!allSlots.find(slot => slot.time === this.startAt)) {
                             throw new Error('Schedule interval mismatch');
