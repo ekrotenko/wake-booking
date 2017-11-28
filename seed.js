@@ -344,7 +344,7 @@ db.sync({force: true})
         console.log(`${createdSchedules.length} schedules created`)
     })
     .then(() => {
-        return Promise.map(blockersData, un => Blocker.create(un))
+        return Promise.map(blockersData, blocker => Blocker.create(blocker))
     })
     .then(createdUns => {
         console.log(`${createdUns.length} unavailabilities created`);
