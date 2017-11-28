@@ -113,20 +113,13 @@ function _getAllocations(orders) {
 function _parseRecurringWeekMask(scheduleSettings) {
     const parseResult = {};
     scheduleSettings.forEach(setting => {
-        let mask = (setting.weekMask).toString(2);
-        let emptyDays = 7 - mask.length;
-        while (emptyDays > 0) {
-            mask = 0 + mask;
-            emptyDays--;
-        }
-        mask = mask.split('');
-        mask.forEach((day, index) => {
+        _maskToArray(setting.weekMask).forEach((day, index) => {
             const weekDay = moment.weekdays(index).toLowerCase();
             parseResult[`${weekDay}`] = (!parseResult[`${weekDay}`]) ? [] : parseResult[`${weekDay}`];
-            if (day == 1) {
+            if (day > 0) {
                 parseResult[`${weekDay}`].push({
-                    from: moment(setting.timeFrom, 'hh:mm:ss').format(timeFormat),
-                    to: moment(setting.timeTo, 'hh:mm:ss').format(timeFormat)
+                    from: setting.timeFrom,
+                    to: setting.timeTo
                 })
             }
         })
@@ -137,14 +130,7 @@ function _parseRecurringWeekMask(scheduleSettings) {
 
 function _parseScheduleWeekMask(schedule) {
     const parseResult = {};
-    let mask = (schedule.weekMask).toString(2);
-    let emptyDays = 7 - mask.length;
-    while (emptyDays > 0) {
-        mask = 0 + mask;
-        emptyDays--;
-    }
-    mask = mask.split('');
-    mask.forEach((day, index) => {
+    _maskToArray(schedule.weekMask).forEach((day, index) => {
         const weekDay = moment.weekdays(index).toLowerCase();
         if (day > 0) {
             parseResult[`${weekDay}`] = {
@@ -156,6 +142,15 @@ function _parseScheduleWeekMask(schedule) {
 
     return parseResult;
 
+}
+
+function _maskToArray(intMask) {
+    let mask = (intMask).toString(2);
+    while (mask.length < 7) {
+        mask = 0 + mask;
+    }
+
+    return mask.split('');
 }
 
 module.exports = ScheduleHelpers;
