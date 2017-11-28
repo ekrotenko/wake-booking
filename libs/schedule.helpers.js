@@ -57,15 +57,15 @@ class ScheduleHelpers {
         })
             .then(blockers => {
                 const blockersFiltered = {disposable: [], recurring: []};
-                blockers.forEach(un => {
-                    if (un.type === 'disposable') {
+                blockers.forEach(blocker => {
+                    if (blocker.type === 'disposable') {
                         blockersFiltered.disposable.push({
-                            from: `${un.dateFrom} ${un.timeFrom}`,
-                            to: `${un.dateTo} ${un.timeTo}`
+                            from: `${blocker.dateFrom} ${blocker.timeFrom}`,
+                            to: `${blocker.dateTo} ${blocker.timeTo}`
                         })
                     }
                     else {
-                        blockersFiltered.recurring.push(un);
+                        blockersFiltered.recurring.push(blocker);
                     }
                 });
                 blockersFiltered.recurring = _parseRecurringWeekMask(blockersFiltered.recurring);
@@ -110,9 +110,9 @@ function _getAllocations(orders) {
     });
 }
 
-function _parseRecurringWeekMask(scheduleSettings) {
+function _parseRecurringWeekMask(recurrings) {
     const parseResult = {};
-    scheduleSettings.forEach(setting => {
+    recurrings.forEach(setting => {
         _maskToArray(setting.weekMask).forEach((day, index) => {
             const weekDay = moment.weekdays(index).toLowerCase();
             parseResult[`${weekDay}`] = (!parseResult[`${weekDay}`]) ? [] : parseResult[`${weekDay}`];
