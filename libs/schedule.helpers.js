@@ -14,6 +14,7 @@ class ScheduleHelpers {
 
     static getTimeSlots(reqOrder) {
         return ScheduleHelpers.configureSchedule(reqOrder).then(schedule => {
+
             const timeSettings = {
                 from: reqOrder.date,
                 to: moment(reqOrder.date).add(1, 'days').format(dateFormat),
@@ -37,9 +38,13 @@ class ScheduleHelpers {
         })
             .then(orders => {
                 const schedule = _parseSchedule(reqOrder.schedule);
+
                 for (let key in schedule) {
-                    schedule[key].unavailability = reqOrder.blockers.recurring[`${key}`] || [];
+                    if (schedule.hasOwnProperty(key)) {
+                        schedule[key].unavailability = reqOrder.blockers.recurring[`${key}`] || [];
+                    }
                 }
+
                 schedule.allocated = _getAllocations(orders);
                 schedule.unavailability = reqOrder.blockers.disposable;
 
@@ -118,10 +123,13 @@ function _parseDisposables(disposables) {
 
 function _parseRecurrings(recurrings) {
     const parseResult = {};
+
     recurrings.forEach(setting => {
         _maskToArray(setting.weekMask).forEach((day, index) => {
             const weekDay = moment.weekdays(index).toLowerCase();
+
             parseResult[`${weekDay}`] = (!parseResult[`${weekDay}`]) ? [] : parseResult[`${weekDay}`];
+
             if (day > 0) {
                 parseResult[`${weekDay}`].push({
                     from: setting.timeFrom,
@@ -136,8 +144,10 @@ function _parseRecurrings(recurrings) {
 
 function _parseSchedule(schedule) {
     const parseResult = {};
+
     _maskToArray(schedule.weekMask).forEach((day, index) => {
         const weekDay = moment.weekdays(index).toLowerCase();
+
         if (day > 0) {
             parseResult[`${weekDay}`] = {
                 from: schedule.timeFrom,
@@ -151,6 +161,7 @@ function _parseSchedule(schedule) {
 
 function _maskToArray(intMask) {
     let mask = (intMask).toString(2);
+
     while (mask.length < 7) {
         mask = 0 + mask;
     }
