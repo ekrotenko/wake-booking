@@ -36,9 +36,9 @@ class ScheduleHelpers {
             }
         })
             .then(orders => {
-                const schedule = _parseScheduleWeekMask(reqOrder.schedule);
+                const schedule = _parseSchedule(reqOrder.schedule);
                 for (let key in schedule) {
-                    schedule[key].unavailability = reqOrder.blockers.recurring[`${key}`];
+                    schedule[key].unavailability = reqOrder.blockers.recurring[`${key}`] || [];
                 }
                 schedule.allocated = _getAllocations(orders);
                 schedule.unavailability = reqOrder.blockers.disposable;
@@ -56,21 +56,17 @@ class ScheduleHelpers {
             }
         })
             .then(blockers => {
-                const blockersFiltered = {disposable: [], recurring: []};
-                blockers.forEach(blocker => {
-                    if (blocker.type === 'disposable') {
-                        blockersFiltered.disposable.push({
-                            from: `${blocker.dateFrom} ${blocker.timeFrom}`,
-                            to: `${blocker.dateTo} ${blocker.timeTo}`
-                        })
-                    }
-                    else {
-                        blockersFiltered.recurring.push(blocker);
-                    }
-                });
-                blockersFiltered.recurring = _parseRecurringWeekMask(blockersFiltered.recurring);
+                const bFiltered = {};
 
-                return blockersFiltered;
+                bFiltered.disposable = _parseDisposables(blockers.filter(b => {
+                    return b.type === 'disposable';
+                }));
+
+                bFiltered.recurring = _parseRecurrings(blockers.filter(b => {
+                    return b.type === 'recurring';
+                }));
+
+                return bFiltered;
             })
     }
 
@@ -110,7 +106,17 @@ function _getAllocations(orders) {
     });
 }
 
-function _parseRecurringWeekMask(recurrings) {
+function _parseDisposables(disposables) {
+    return disposables.map(blocker => {
+        return {
+            from: `${blocker.dateFrom} ${blocker.timeFrom}`,
+            to: `${blocker.dateTo} ${blocker.timeTo}`
+        }
+    })
+
+}
+
+function _parseRecurrings(recurrings) {
     const parseResult = {};
     recurrings.forEach(setting => {
         _maskToArray(setting.weekMask).forEach((day, index) => {
@@ -128,7 +134,7 @@ function _parseRecurringWeekMask(recurrings) {
     return parseResult;
 }
 
-function _parseScheduleWeekMask(schedule) {
+function _parseSchedule(schedule) {
     const parseResult = {};
     _maskToArray(schedule.weekMask).forEach((day, index) => {
         const weekDay = moment.weekdays(index).toLowerCase();
@@ -141,7 +147,6 @@ function _parseScheduleWeekMask(schedule) {
     });
 
     return parseResult;
-
 }
 
 function _maskToArray(intMask) {
