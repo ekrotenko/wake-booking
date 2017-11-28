@@ -39,8 +39,13 @@ router.post('/', (req, res, next) => {
     ScheduleHelpers.getRopewaySchedule(req.body.ropewayId, req.body.date)
         .then(schedule => {
             req.body.schedule = schedule;
-            Order.create(req.body)
-                .then(res.send.bind(res))
+            ScheduleHelpers.getBlockers(req.body.ropewayId, req.body.date)
+                .then(blockers=>{
+                req.body.blockers = blockers;
+                    Order.create(req.body)
+                        .then(res.send.bind(res))
+                        .catch(next);
+                })
                 .catch(next);
         })
         .catch(next);

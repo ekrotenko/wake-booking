@@ -7,6 +7,7 @@ const Park = require('./models/Park');
 const Schedule = require('./models/Schedule');
 const Order = require('./models/Order');
 const User = require('./models/User');
+const Blocker = require('./models/Blocker');
 const faker = require('faker');
 
 // each of the following array will be iterated and Created
@@ -131,7 +132,8 @@ const scheduleData = [
         timeTo: '20:00',
         duration: 60,
         interval: 15,
-        ropewayId: 1
+        ropewayId: 1,
+        weekMask: 127
     },
     {
         dateFrom: '2017-06-01',
@@ -171,8 +173,8 @@ const scheduleData = [
     },
     {
         dateFrom: '2017-09-01',
-        dateTo: '2017-11-30',
-        timeFrom: '16:00',
+        dateTo: '2017-12-31',
+        timeFrom: '9:00',
         timeTo: '18:00',
         duration: 60,
         interval: 30,
@@ -206,7 +208,29 @@ const orderData = [
         endAt: '2017-10-03 15:00',
         status: 'declined'
     },
-]
+];
+
+const blockersData = [
+    {
+        name: 'service',
+        type: 'disposable',
+        dateFrom: '2017-11-29',
+        dateTo: '2017-11-29',
+        timeFrom: ' 09:00',
+        timeTo: ' 13:00',
+        ropewayId: 5,
+    },
+    {
+        name: 'morning abons',
+        type: 'recurring',
+        dateFrom: '2017-09-01',
+        dateTo: '2017-12-31',
+        timeFrom: ' 09:00',
+        timeTo: ' 11:00',
+        ropewayId: 5,
+        weekMask: 62,
+    },
+];
 
 const parkData = [
     {
@@ -319,7 +343,12 @@ db.sync({force: true})
     .then(createdSchedules => {
         console.log(`${createdSchedules.length} schedules created`)
     })
-
+    .then(() => {
+        return Promise.map(blockersData, blocker => Blocker.create(blocker))
+    })
+    .then(createdUns => {
+        console.log(`${createdUns.length} unavailabilities created`);
+    })
     .then(() => {
         console.log('Seeded successfully');
     })

@@ -52,10 +52,20 @@ const Order = db.define('order', {
         },
         schedule: {
             type: DataTypes.VIRTUAL
+        },
+        blockers: {
+            type: DataTypes.VIRTUAL
         }
     },
     {
         paranoid: true,
+        hooks: {
+            beforeCreate: (order, options) => {
+                order.schedule = undefined;
+                order.blockers = undefined;
+            }
+
+        },
         validate: {
             verifyScheduleRange() {
                 if (moment(this.startAt, timeFormat).isBefore(moment(this.schedule.timeFrom, timeFormat)) ||
@@ -71,7 +81,7 @@ const Order = db.define('order', {
                 }
             },
             verifyTimeSlot() {
-                return SchedulerHelpers.getTimeSlots(this.ropewayId, this.date, this.schedule)
+                return SchedulerHelpers.getTimeSlots(this)
                     .then(allSlots => {
                         if (!allSlots.find(slot => slot.time === this.startAt)) {
                             throw new Error('Schedule interval mismatch');
