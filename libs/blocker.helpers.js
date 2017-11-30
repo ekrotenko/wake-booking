@@ -1,11 +1,16 @@
+const Moment = require('moment');
+const MomentRange = require('moment-range');
+const moment = MomentRange.extendMoment(Moment);
+
 const MaskHelpers = require('./mask.helpers');
 const Blocker = require('../models/Blocker');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
-const moment = require('moment');
+
 const timeFormat = 'HH:mm';
 const dateFormat = 'YYYY-MM-DD';
+
 
 class BlockerHelpers {
 
@@ -30,6 +35,40 @@ class BlockerHelpers {
 
                 return bFiltered;
             })
+    }
+
+    static getBlockerIntersections(reqBlocker) {
+        const Blocker = require('../models/Blocker');
+        return Blocker.findAll({
+            where: {
+                ropewayId: {[Op.eq]: reqBlocker.ropewayId},
+                [Op.and]: {
+                    [Op.or]: {
+                        dateFrom: {
+                            [Op.inclusive]: [new Date(reqBlocker.dateFrom), new Date(reqBlocker.dateTo)]
+                        },
+                        dateTo: {
+                            [Op.inclusive]: [new Date(reqBlocker.dateFrom), new Date(reqBlocker.dateTo)]
+                        }
+                    }
+                }
+            }
+        })
+            .then(blockers => {
+                const intersections = blockers.filter(b => {
+                    const bTimeFrom = moment(b.timeFrom, 'HH:mm:ss');
+                    const bTimeTo = moment(b.timeTo, 'HH:mm:ss').subtract(1, 'second');
+                    const rTimeFrom = moment(reqBlocker.timeFrom, timeFormat);
+                    const rTimeTo = moment(reqBlocker.timeTo, timeFormat);
+
+                    const rRange = moment.range(rTimeFrom, rTimeTo);
+
+                    return rRange.contains(bTimeFrom) || rRange.contains(bTimeTo)
+                });
+
+                return intersections;
+            });
+
     }
 }
 
@@ -64,4 +103,4 @@ function _parseRecurrings(recurrings) {
     return parseResult;
 }
 
-module.exports = BlockerHelpers;
+module.exports = BlockerHelpers

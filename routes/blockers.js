@@ -21,5 +21,11 @@ router.get('/', (req, res, next) => {
         .catch(next);
 });
 
+router.post('/', (req, res, next) => {
+    Blocker.create(req.body)
+        .then(res.send.bind(res))
+        .catch(next);
+});
+
 
 module.exports = router;
