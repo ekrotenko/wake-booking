@@ -51,7 +51,7 @@ class BlockerHelpers {
             }
         })
             .then(blockers => {
-                const intersections = blockers.filter(b => {
+                return blockers.filter(b => {
                     const bTimeFrom = moment(b.timeFrom, 'HH:mm:ss');
                     const bTimeTo = moment(b.timeTo, 'HH:mm:ss').subtract(1, 'second');
                     const rTimeFrom = moment(reqBlocker.timeFrom, timeFormat);
@@ -64,8 +64,6 @@ class BlockerHelpers {
                             (b.type === 'recurring' && (b.weekMask & reqBlocker.weekMask) > 0)
                     }
                 });
-
-                return intersections;
             });
     }
 }
