@@ -49,21 +49,21 @@ const userData = [
         firstName: 'Eugene',
         lastName: 'Krotenko',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0500566667',
     },
     {
         firstName: 'Ivan',
         lastName: 'Bigass',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0509476308',
     },
     {
         firstName: 'Kirill',
         lastName: 'Ulanov',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0679476308',
         isAdmin: true
     },
@@ -71,7 +71,7 @@ const userData = [
         firstName: 'Mikhail',
         lastName: 'Papunov',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0669476308',
         isAdmin: true
     },
@@ -79,21 +79,21 @@ const userData = [
         firstName: 'Maks',
         lastName: 'Skoryk',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0939476308',
     },
     {
         firstName: 'Liza',
         lastName: 'Dovga',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0739476308',
     },
     {
         firstName: 'Sergey',
         lastName: 'Marlenko',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0509476308',
         isOwner: true
     },
@@ -101,7 +101,7 @@ const userData = [
         firstName: 'Tatyana',
         lastName: 'Vorobieva',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0509470308',
         isOwner: true
     },
@@ -109,7 +109,7 @@ const userData = [
         firstName: 'Ruslan',
         lastName: 'Lohopetov',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0502876308',
         isOwner: true
     },
@@ -117,7 +117,7 @@ const userData = [
         firstName: 'Roman',
         lastName: 'Makarenkov',
         email: faker.internet.email(),
-        password: '123456',
+        password: 'U1asd*s8',
         phone: '0507076308',
         isOwner: true
     },
@@ -294,7 +294,6 @@ const parkData = [
         longitude: '3948578',
     },
 ];
-
 
 // We will go through the Models one by one and create an instance
 // for each element in the array. Look below for a commented out version of how to do this in one slick nested Promise.

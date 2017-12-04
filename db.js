@@ -31,4 +31,3 @@ Order.belongsTo(User, {foreignKey: {allowNull: false}});
 Order.belongsTo(Ropeway, {foreignKey: {allowNull: false}});
 User.hasMany(Order);
 Ropeway.hasMany(Order);
-

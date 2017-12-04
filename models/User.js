@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
-const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 const User = db.define('user', {
     firstName: {
@@ -27,12 +27,9 @@ const User = db.define('user', {
             len: [5, 50]
         }
     },
-    password: {
+    hashedPassword: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-            min: 6
-        }
     },
     phone: {
         type: DataTypes.STRING,
@@ -48,16 +45,46 @@ const User = db.define('user', {
     isOwner: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    salt: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: function(){
+            return crypto.randomBytes(128).toString('base64');
+        }
+    },
+    password: {
+        type: DataTypes.VIRTUAL,
+        set: function (password) {
+            this.setDataValue('password', password);
+            this.setDataValue('hashedPassword', this.encryptPassword(password));
+        },
+        validate: {
+            min: 8,
+            is: {
+                args: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$&*])(?=.*[0-9]).{8}$/,
+                msg: 'Password must be at least 8 character length and contain one capital, special and digit character'
+            },
+        }
     }
 }, {
     paranoid: true,
     hooks: {
         afterValidate: user => {
-            user.password = bcrypt.hashSync(user.password, 8);
             if (user.isOwner)
                 user.isAdmin = true;
         }
     }
 });
 
+User.prototype.encryptPassword = function (password) {
+    return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
+    //more secure - return crypto.pbkdf2Sync(password, this.salt, 10000, 512);
+};
+
+User.prototype.checkPassword = function (password) {
+    return this.hashedPassword === this.encryptPassword(password);
+};
+
 module.exports = User;
+

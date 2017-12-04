@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const config = require('./config');
 const db = require('./db');
+const auth = require('./libs/auth')();
+
 // Routers:
 const parksRouter = require('./routes/parks');
 const usersRouter = require('./routes/users');
@@ -11,6 +13,7 @@ const ropewaysRouter = require('./routes/ropeways');
 const ordersRouter = require('./routes/orders');
 const schedules = require('./routes/schedules');
 const blockers = require('./routes/blockers');
+const authRoute = require('./routes/auth');
 
 const app = express();
 
@@ -21,7 +24,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Auth
+app.use(auth.initialize());
 // Using routers:
+app.use('/auth', authRoute);
 app.use('/parks', parksRouter);
 app.use('/users', usersRouter);
 app.use('/ropeways', ropewaysRouter);
