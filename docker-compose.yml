@@ -1,0 +1,29 @@
+version: '2.1'
+
+services:
+
+  wb-backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/wake.booking
+    environment:
+      DB_USERNAME: root
+      DB_NAME: wake_booking
+      DB_HOST: mysqldb
+      DB_PORT: 3306
+      NODE_ENV: "development"
+    depends_on:
+      - mysqldb
+
+  mysqldb:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"

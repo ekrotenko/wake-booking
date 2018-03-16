@@ -10,8 +10,10 @@
             }
         },
     "db": {
+        "server": "mysqldb",
+        "port": 3000,
         "dbName": "wake_booking",
         "username": "root",
-        "password": "aaaaaaaa"
+        "password": ""
     }
 }

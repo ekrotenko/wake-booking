@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const config = require('./config').get('db');
 
 const db = new Sequelize(config.dbName, config.username, config.password, {
+    host: config.server,
     dialect: 'mysql',
     logging: false,
     operatorsAliases: Sequelize.Op
