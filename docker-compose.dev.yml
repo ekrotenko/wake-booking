@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
+      - "5858:5858"
     volumes:
       - ./:/wake.booking
     environment:
@@ -19,6 +20,7 @@ services:
       NODE_ENV: "development"
     depends_on:
       - mysqldb
+    entrypoint: ["npm", "run", "debug"]
 
   mysqldb:
     image: mysql:5.7
