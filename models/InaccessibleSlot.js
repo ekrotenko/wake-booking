@@ -1,13 +1,8 @@
-const SchedulerHelpers = require('../libs/schedule.helpers');
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
-const moment = require('moment');
 
-const timeFormat = 'HH:mm';
-const dateFormat = 'YYYY-MM-DD';
-
-const Blocker = db.define('blocker', {
+const InaccessibleSlot = db.define('inaccessible_slot', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -69,4 +64,4 @@ const Blocker = db.define('blocker', {
     paranoid: true,
 });
 
-module.exports = Blocker;
+module.exports = InaccessibleSlot;

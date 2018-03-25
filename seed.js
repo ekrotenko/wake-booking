@@ -7,7 +7,7 @@ const Park = require('./models/Park');
 const Schedule = require('./models/Schedule');
 const Order = require('./models/Order');
 const User = require('./models/User');
-const Blocker = require('./models/Blocker');
+const InaccessibleSlot = require('./models/InaccessibleSlot');
 const faker = require('faker');
 
 // each of the following array will be iterated and Created
@@ -210,7 +210,7 @@ const orderData = [
     },
 ];
 
-const blockersData = [
+const inaccessibleSlotsData = [
     {
         name: 'service',
         type: 'disposable',
@@ -343,7 +343,7 @@ db.sync({force: true})
         console.log(`${createdSchedules.length} schedules created`)
     })
     .then(() => {
-        return Promise.map(blockersData, blocker => Blocker.create(blocker))
+        return Promise.map(inaccessibleSlotsData, inaccessibleSlot => InaccessibleSlot.create(inaccessibleSlot))
     })
     .then(createdUns => {
         console.log(`${createdUns.length} unavailabilities created`);

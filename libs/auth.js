@@ -3,11 +3,11 @@ const Op = require('sequelize').Op;
 const passport = require('passport');
 const passportJWT = require('passport-jwt');
 const User = require('../models/User');
-const config = require('../config');
+const config = require('../config').get(process.env.NODE_ENV);
 const ExtractJwt = passportJWT.ExtractJwt;
 const Strategy = passportJWT.Strategy;
 const params = {
-    secretOrKey: config.get('security:jwt:jwtSecret'),
+    secretOrKey: config.security.jwt.jwtSecret,
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
 };
 
@@ -44,7 +44,7 @@ module.exports = function () {
             return passport.initialize();
         },
         authenticate: function () {
-            return passport.authenticate('jwt', config.get('security:jwt:jwtSession'));
+            return passport.authenticate('jwt', config.security.jwt.jwtSession);
         }
     };
 };

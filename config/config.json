@@ -1,6 +1,12 @@
 {
-    "port": 3000,
-    "security":
+    "development": {
+        "port": 3000,
+        "username": "root",
+        "password": null,
+        "database": "wake_booking",
+        "host": "mysqldb",
+        "dialect": "mysql",
+        "security":
         {
             "jwt": {
                 "jwtSecret": "MyS3cr3tK3Y0000iii",
@@ -8,12 +14,30 @@
                     "session": false
                 }
             }
-        },
-    "db": {
-        "server": "mysqldb",
-        "port": 3000,
-        "dbName": "wake_booking",
+        }
+    },
+    "local": {
+      "port": 3000,
+      "username": "root",
+      "password": null,
+      "database": "wake_booking",
+      "host": "127.0.0.1",
+      "dialect": "mysql",
+      "security":
+      {
+        "jwt": {
+          "jwtSecret": "MyS3cr3tK3Y0000iii",
+          "jwtSession": {
+            "session": false
+          }
+        }
+      }
+    },
+    "production": {
         "username": "root",
-        "password": ""
+        "password": null,
+        "database": "database_test",
+        "host": "127.0.0.1",
+        "dialect": "mysql"
     }
 }

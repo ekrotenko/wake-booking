@@ -53,7 +53,7 @@ const Order = db.define('order', {
         schedule: {
             type: DataTypes.VIRTUAL
         },
-        blockers: {
+        inaccessibleSlots: {
             type: DataTypes.VIRTUAL
         }
     },
@@ -62,7 +62,7 @@ const Order = db.define('order', {
         hooks: {
             beforeCreate: (order, options) => {
                 order.schedule = undefined;
-                order.blockers = undefined;
+                order.inaccessibleSlots = undefined;
             }
 
         },

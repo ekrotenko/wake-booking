@@ -41,9 +41,9 @@ router.post('/', auth.authenticate(), (req, res, next) => {
     ScheduleHelpers.getRopewaySchedule(req.body.ropewayId, req.body.date)
         .then(schedule => {
             req.body.schedule = schedule;
-            ScheduleHelpers.getBlockers(req.body.ropewayId, req.body.date)
-                .then(blockers => {
-                    req.body.blockers = blockers;
+            ScheduleHelpers.getInaccessibleSlots(req.body.ropewayId, req.body.date)
+                .then(inaccessibleSlots => {
+                    req.body.inaccessibleSlots = inaccessibleSlots;
                     Order.create(req.body)
                         .then(res.send.bind(res))
                         .catch(next);

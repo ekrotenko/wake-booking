@@ -1,21 +1,21 @@
 const ScheduleHelpers = require('../libs/schedule.helpers');
 const router = require('express').Router();
-const Blocker = require('../models/Blocker');
+const InaccessibleSlot = require('../models/InaccessibleSlot');
 
 router.param('id', (req, res, next, id) => {
-    Blocker.findById(id)
+    InaccessibleSlot.findById(id)
         .then(order => {
             if (order) {
                 req.order = order;
                 next();
             }
-            else res.status(404).send('Blocker not found');
+            else res.status(404).send('Inaccessible slots not found');
         })
         .catch(next)
 });
 
 router.get('/', (req, res, next) => {
-    Blocker.findAll()
+    InaccessibleSlot.findAll()
         .then(res.send.bind(res))
         .catch(next);
 });
