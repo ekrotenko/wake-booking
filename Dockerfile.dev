@@ -1,0 +1,10 @@
+FROM node:carbon
+MAINTAINER Eugene Krotenko <ekrotenko.ua@gmail.com>
+
+ADD package.json /tmp/package.json
+RUN cd /tmp && npm install --production
+RUN mkdir -p /wake.booking && cp -a /tmp/node_modules /wake.booking
+
+WORKDIR /wake.booking
+
+RUN npm install -g -q nodemon sequelize-cli

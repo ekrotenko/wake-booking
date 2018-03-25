@@ -1,3 +1,6 @@
 node_modules
-./idea
+.idea/**/*
+*.iml
 **/DS_Store
+.vscode/
+package-lock.json
