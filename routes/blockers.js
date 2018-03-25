@@ -1,4 +1,5 @@
-const ScheduleHelpers = require('../libs/schedule.helpers');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const router = require('express').Router();
 const Blocker = require('../models/Blocker');
 
@@ -14,8 +15,18 @@ router.param('id', (req, res, next, id) => {
         .catch(next)
 });
 
-router.get('/', (req, res, next) => {
-    Blocker.findAll()
+router.get('/ropeway/:ropewayId', (req, res, next) => {
+    Blocker.findAll({where:{
+        ropewayId: {
+            [Op.eq]: req.params.ropewayId
+        }
+    }})
+        .then(res.send.bind(res))
+        .catch(next);
+});
+
+router.post('/', (req, res, next) => {
+    Blocker.create(req.body)
         .then(res.send.bind(res))
         .catch(next);
 });

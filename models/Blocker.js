@@ -1,4 +1,4 @@
-const SchedulerHelpers = require('../libs/schedule.helpers');
+const BlockerHelpers = require('../libs/blocker.helpers');
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
@@ -67,6 +67,16 @@ const Blocker = db.define('blocker', {
     }
 }, {
     paranoid: true,
+    validate: {
+        isIntersected() {
+            return BlockerHelpers.getBlockerIntersections(this)
+                .then(i => {
+                    if (i.length > 0) {
+                        throw new Error('Blocker intersected!');
+                    }
+                })
+        }
+    }
 });
 
 module.exports = Blocker;
