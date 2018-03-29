@@ -2,12 +2,12 @@
 const Promise = require('bluebird');
 // bring in the db and all the Models to seed
 const db = require('./db');
-const Ropeway = require('./models/Ropeway');
-const Park = require('./models/Park');
-const Schedule = require('./models/Schedule');
-const Order = require('./models/Order');
-const User = require('./models/User');
-const InaccessibleSlot = require('./models/InaccessibleSlot');
+const Ropeway = require('./models/ropeway');
+const Park = require('./models/park');
+const Schedule = require('./models/schedule');
+const Order = require('./models/order');
+const User = require('./models/user');
+const InaccessibleSlot = require('./models/inaccessible.slot');
 const faker = require('faker');
 
 // each of the following array will be iterated and Created

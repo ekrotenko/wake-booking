@@ -5,8 +5,10 @@
   "scripts": {
     "docker:dev": "docker-compose -f docker-compose.dev.yml up",
     "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
-    "debug": "nodemon --inspect=5858 app.js",
+    "migrations:local": "sequelize db:migrate --env local",
+    "debug": "nodemon --inspect=0.0.0.0:5858 app.js",
     "start": "nodemon app.js",
+    "start:local": "export NODE_ENV=local && npm run start",
     "seed": "node seed.js"
   },
   "dependencies": {
@@ -28,7 +30,8 @@
     "nodemon": "^1.17.2",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
-    "sequelize": "^4.37.4",
+    "sequelize": "^4.37.5",
+    "sequelize-auto-migrations": "^1.0.2",
     "sequelize-cli": "^4.0.0",
     "serve-favicon": "~2.4.2",
     "volleyball": "^1.4.1"

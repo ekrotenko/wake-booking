@@ -2,7 +2,7 @@ const express = require('express');
 const volleyball = require('volleyball');
 const bodyParser = require('body-parser');
 const path = require('path');
-const config = require('./config').get(process.env.NODE_ENV);
+const config = require('./config')[process.env.NODE_ENV].app;
 const db = require('./db');
 const auth = require('./libs/auth')();
 

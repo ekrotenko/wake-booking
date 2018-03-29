@@ -1,6 +1,6 @@
 const Op = require('sequelize').Op;
 const router = require('express').Router();
-const User = require('../models/User');
+const User = require('../models/user');
 const config = require('../config');
 const jwt = require('jwt-simple');
 

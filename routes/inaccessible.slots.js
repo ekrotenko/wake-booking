@@ -1,6 +1,6 @@
 const ScheduleHelpers = require('../libs/schedule.helpers');
 const router = require('express').Router();
-const InaccessibleSlot = require('../models/InaccessibleSlot');
+const InaccessibleSlot = require('../models/inaccessible.slot');
 
 router.param('id', (req, res, next, id) => {
     InaccessibleSlot.findById(id)

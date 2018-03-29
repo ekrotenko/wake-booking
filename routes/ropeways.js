@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
-const Ropeway = require('../models/Ropeway');
-const Park = require('../models/Park');
+const Ropeway = require('../models/ropeway');
+const Park = require('../models/park');
 
 router.param('id', (req, res, next, id) => {
     Ropeway.findById(id,

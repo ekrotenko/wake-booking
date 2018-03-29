@@ -3,8 +3,8 @@ const Op = Sequelize.Op;
 const Scheduler = require('@ssense/sscheduler').Scheduler;
 const scheduler = new Scheduler();
 
-const Schedule = require('../models/Schedule');
-const InaccessibleSlot = require('../models/InaccessibleSlot');
+const Schedule = require('../models/schedule');
+const InaccessibleSlot = require('../models/inaccessible.slot');
 
 const moment = require('moment');
 const timeFormat = 'HH:mm';
@@ -28,7 +28,7 @@ class ScheduleHelpers {
     }
 
     static configureSchedule(reqOrder) {
-        const Order = require('../models/Order');
+        const Order = require('../models/order');
 
         return Order.findAll({
             where: {

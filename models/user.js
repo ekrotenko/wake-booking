@@ -49,20 +49,17 @@ const User = db.define('user', {
     salt: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: function(){
-            return crypto.randomBytes(128).toString('base64');
-        }
     },
     password: {
         type: DataTypes.VIRTUAL,
-        set: function (password) {
+        set(password) {
             this.setDataValue('password', password);
             this.setDataValue('hashedPassword', this.encryptPassword(password));
         },
         validate: {
             min: 8,
             is: {
-                args: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$&*])(?=.*[0-9]).{8}$/,
+                args: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$&*])(?=.*[0-9]).{8,}$/,
                 msg: 'Password must be at least 8 character length and contain one capital, special and digit character'
             },
         }
@@ -78,6 +75,9 @@ const User = db.define('user', {
 });
 
 User.prototype.encryptPassword = function (password) {
+    if(!(this.salt instanceof Buffer)){
+        this.salt = crypto.randomBytes(128).toString('base64');
+    }
     return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
     //more secure - return crypto.pbkdf2Sync(password, this.salt, 10000, 512);
 };

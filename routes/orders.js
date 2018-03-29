@@ -1,6 +1,6 @@
 const ScheduleHelpers = require('../libs/schedule.helpers');
 const router = require('express').Router();
-const Order = require('../models/Order');
+const Order = require('../models/order');
 const auth = require('../libs/auth')();
 
 router.param('id', (req, res, next, id) => [

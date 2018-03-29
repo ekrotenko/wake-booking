@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
 
-const InaccessibleSlot = db.define('inaccessible_slot', {
+const InaccessibleSlot = db.define('inaccessibleSlot', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
