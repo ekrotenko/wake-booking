@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const Schedule = require('../models/Schedule');
-const Ropeway = require('../models/Ropeway');
+const Schedule = require('../models/schedule');
+const Ropeway = require('../models/ropeway');
 
 router.param('id', (req, res, next, id) => {
     Schedule.findById(id, {

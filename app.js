@@ -2,7 +2,7 @@ const express = require('express');
 const volleyball = require('volleyball');
 const bodyParser = require('body-parser');
 const path = require('path');
-const config = require('./config');
+const config = require('./config/app');
 const db = require('./db');
 const auth = require('./libs/auth')();
 
@@ -12,7 +12,7 @@ const usersRouter = require('./routes/users');
 const ropewaysRouter = require('./routes/ropeways');
 const ordersRouter = require('./routes/orders');
 const schedules = require('./routes/schedules');
-const blockers = require('./routes/blockers');
+const inaccessibleSlots = require('./routes/inaccessible.slots');
 const authRoute = require('./routes/auth');
 
 const app = express();
@@ -34,7 +34,7 @@ app.use('/users', usersRouter);
 app.use('/ropeways', ropewaysRouter);
 app.use('/orders', ordersRouter);
 app.use('/schedules', schedules);
-app.use('/blockers', blockers);
+app.use('/inaccessibleSlots', inaccessibleSlots);
 
 app.use('*', (req, res, next) => {
     res.send('This is default route')
@@ -47,14 +47,14 @@ app.use((err, req, res, next) => {
     next();
 });
 
-let server = app.listen(config.get('port'), () => {
+let server = app.listen(config.port, () => {
     console.log('Listening on port:', server.address().port);
-    db.sync({force: false})
-        .then(() => {
-            console.log('...DB is synced')
-        })
-        .catch(function (error) {
-            throw error;
-        });
+    // db.sync({force: false})
+    //     .then(() => {
+    //         console.log('...DB is synced')
+    //     })
+    //     .catch(function (error) {
+    //         throw error;
+    //     });
 });
 

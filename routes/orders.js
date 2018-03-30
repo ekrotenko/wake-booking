@@ -1,6 +1,6 @@
 const ScheduleHelpers = require('../libs/schedule.helpers');
 const router = require('express').Router();
-const Order = require('../models/Order');
+const Order = require('../models/order');
 const auth = require('../libs/auth')();
 
 router.param('id', (req, res, next, id) => [
@@ -41,9 +41,9 @@ router.post('/', auth.authenticate(), (req, res, next) => {
     ScheduleHelpers.getRopewaySchedule(req.body.ropewayId, req.body.date)
         .then(schedule => {
             req.body.schedule = schedule;
-            ScheduleHelpers.getBlockers(req.body.ropewayId, req.body.date)
-                .then(blockers => {
-                    req.body.blockers = blockers;
+            ScheduleHelpers.getInaccessibleSlots(req.body.ropewayId, req.body.date)
+                .then(inaccessibleSlots => {
+                    req.body.inaccessibleSlots = inaccessibleSlots;
                     Order.create(req.body)
                         .then(res.send.bind(res))
                         .catch(next);

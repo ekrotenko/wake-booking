@@ -1,13 +1,8 @@
-const BlockerHelpers = require('../libs/blocker.helpers');
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const db = require('../db');
-const moment = require('moment');
 
-const timeFormat = 'HH:mm';
-const dateFormat = 'YYYY-MM-DD';
-
-const Blocker = db.define('blocker', {
+const InaccessibleSlot = db.define('inaccessibleSlot', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -67,16 +62,16 @@ const Blocker = db.define('blocker', {
     }
 }, {
     paranoid: true,
-    validate: {
-        isIntersected() {
-            return BlockerHelpers.getBlockerIntersections(this)
-                .then(i => {
-                    if (i.length > 0) {
-                        throw new Error('Blocker intersected!');
-                    }
-                })
-        }
-    }
+    // validate: {
+    //     isIntersected() {
+    //         return BlockerHelpers.getBlockerIntersections(this)
+    //             .then(i => {
+    //                 if (i.length > 0) {
+    //                     throw new Error('Blocker intersected!');
+    //                 }
+    //             })
+    //     }
+    // }
 });
 
-module.exports = Blocker;
+module.exports = InaccessibleSlot;
