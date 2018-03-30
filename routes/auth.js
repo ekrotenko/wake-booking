@@ -1,7 +1,7 @@
 const Op = require('sequelize').Op;
 const router = require('express').Router();
 const User = require('../models/user');
-const config = require('../config');
+const config = require('../config/app');
 const jwt = require('jwt-simple');
 
 router.post('/token', (req, res, next) => {
@@ -24,7 +24,7 @@ router.post('/token', (req, res, next) => {
                     owner: user.isOwner,
                     updatedAt: user.updatedAt
                 };
-                const token = jwt.encode(payload, config.get('security:jwt:jwtSecret'));
+                const token = jwt.encode(payload, config.security.jwt.jwtSecret'));
                 res.json({
                     token: token
                 });
