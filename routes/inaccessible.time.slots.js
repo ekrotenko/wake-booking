@@ -1,9 +1,9 @@
 const ScheduleHelpers = require('../libs/schedule.helpers');
 const router = require('express').Router();
-const InaccessibleSlot = require('../models/inaccessible.slot');
+const InaccessibleTimeSlot = require('../models').InaccessibleTimeSlot;
 
 router.param('id', (req, res, next, id) => {
-    InaccessibleSlot.findById(id)
+    InaccessibleTimeSlot.findById(id)
         .then(order => {
             if (order) {
                 req.order = order;
@@ -15,7 +15,7 @@ router.param('id', (req, res, next, id) => {
 });
 
 router.get('/', (req, res, next) => {
-    InaccessibleSlot.findAll()
+    InaccessibleTimeSlot.findAll()
         .then(res.send.bind(res))
         .catch(next);
 });

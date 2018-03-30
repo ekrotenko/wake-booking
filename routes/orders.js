@@ -1,7 +1,7 @@
 const ScheduleHelpers = require('../libs/schedule.helpers');
 const router = require('express').Router();
-const Order = require('../models/order');
-const auth = require('../libs/auth')();
+const Order = require('../models').Order;
+// const auth = require('../libs/auth')();
 
 router.param('id', (req, res, next, id) => [
     Order.findById(id)
@@ -36,8 +36,8 @@ router.get('/available', (req, res, next) => {
         .catch(next);
 });
 
-router.post('/', auth.authenticate(), (req, res, next) => {
-    req.body.userId = req.user.id;
+router.post('/', /*auth.authenticate()*/ (req, res, next) => {
+    // req.body.userId = req.user.id;
     ScheduleHelpers.getRopewaySchedule(req.body.ropewayId, req.body.date)
         .then(schedule => {
             req.body.schedule = schedule;

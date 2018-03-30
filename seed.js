@@ -1,7 +1,7 @@
 // importing Bluebird promises so we can Promise.map
 const Promise = require('bluebird');
 // bring in the db and all the Models to seed
-const db = require('./db');
+const db = require('./db_old');
 const Ropeway = require('./models/ropeway');
 const Park = require('./models/park');
 const Schedule = require('./models/schedule');

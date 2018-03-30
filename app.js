@@ -1,9 +1,9 @@
 const express = require('express');
 const volleyball = require('volleyball');
 const bodyParser = require('body-parser');
+const db = require('./models');
 const path = require('path');
 const config = require('./config/app');
-const db = require('./db');
 const auth = require('./libs/auth')();
 
 // Routers:
@@ -12,7 +12,7 @@ const usersRouter = require('./routes/users');
 const ropewaysRouter = require('./routes/ropeways');
 const ordersRouter = require('./routes/orders');
 const schedules = require('./routes/schedules');
-const inaccessibleSlots = require('./routes/inaccessible.slots');
+const inaccessibleSlots = require('./routes/inaccessible.time.slots');
 const authRoute = require('./routes/auth');
 
 const app = express();

@@ -1,20 +1,29 @@
-const Sequelize = require('sequelize');
-const DataTypes = Sequelize.DataTypes;
-const db = require('../db');
-
-const Ropeway = db.define('ropeway', {
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            len: [3, 30]
+module.exports = (sequelize, DataTypes) => {
+    class Ropeway extends sequelize.Model {
+        static associate(models) {
+            Ropeway.belongsTo(models.Park);
+            Ropeway.hasMany(models.Schedule, {foreignKey: {name: 'ropewayId', allowNull: false}});
+            Ropeway.hasMany(models.Order);
         }
-    },
-    description: {
-        type: DataTypes.TEXT
     }
-}, {
-    paranoid: true,
-});
 
-module.exports = Ropeway;
+    Ropeway.init({
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                len: [3, 30]
+            }
+        },
+        description: {
+            type: DataTypes.TEXT
+        }
+    }, {
+        sequelize,
+        tableName: 'ropeways',
+        paranoid: true,
+    });
+
+    return Ropeway;
+};
+

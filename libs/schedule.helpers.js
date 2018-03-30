@@ -4,7 +4,7 @@ const Scheduler = require('@ssense/sscheduler').Scheduler;
 const scheduler = new Scheduler();
 
 const Schedule = require('../models/schedule');
-const InaccessibleSlot = require('../models/inaccessible.slot');
+const InaccessibleSlot = require('../models/inaccessible.time.slot');
 
 const moment = require('moment');
 const timeFormat = 'HH:mm';

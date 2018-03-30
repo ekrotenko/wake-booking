@@ -60,6 +60,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-      await queryInterface.createTable('schedules', {});
+      await queryInterface.dropTable('schedules', {});
   }
 };
