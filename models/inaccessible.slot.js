@@ -62,6 +62,16 @@ const InaccessibleSlot = db.define('inaccessibleSlot', {
     }
 }, {
     paranoid: true,
+    // validate: {
+    //     isIntersected() {
+    //         return BlockerHelpers.getBlockerIntersections(this)
+    //             .then(i => {
+    //                 if (i.length > 0) {
+    //                     throw new Error('Blocker intersected!');
+    //                 }
+    //             })
+    //     }
+    // }
 });
 
 module.exports = InaccessibleSlot;
