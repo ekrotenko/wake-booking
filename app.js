@@ -49,12 +49,12 @@ app.use((err, req, res, next) => {
 
 let server = app.listen(config.port, () => {
     console.log('Listening on port:', server.address().port);
-    db.sync({force: false})
-        .then(() => {
-            console.log('...DB is synced')
-        })
-        .catch(function (error) {
-            throw error;
-        });
+    // db.sync({force: false})
+    //     .then(() => {
+    //         console.log('...DB is synced')
+    //     })
+    //     .catch(function (error) {
+    //         throw error;
+    //     });
 });
 

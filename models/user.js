@@ -75,7 +75,7 @@ const User = db.define('user', {
 });
 
 User.prototype.encryptPassword = function (password) {
-    if(!(this.salt instanceof Buffer)){
+    if (!(this.salt instanceof Buffer)) {
         this.salt = crypto.randomBytes(128).toString('base64');
     }
     return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
