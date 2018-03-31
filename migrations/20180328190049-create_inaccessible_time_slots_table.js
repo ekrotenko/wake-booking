@@ -22,6 +22,10 @@ module.exports = {
           },
           description: {
               type: Sequelize.STRING,
+              allowNull: true,
+          },
+          type: {
+              type: Sequelize.ENUM(['disposable', 'recurring']),
               allowNull: false,
           },
           dateFrom: {

@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
             // Ropeway.belongsTo(models.Park, {foreignKey: 'ropewayId'});
             Ropeway.hasMany(models.Schedule, {foreignKey: {name: 'ropewayId', allowNull: false}});
             Ropeway.hasMany(models.Order, {foreignKey: {name: 'ropewayId', allowNull: false}});
+            Ropeway.hasMany(models.InaccessibleTimeSlot,{foreignKey: {name: 'ropewayId', allowNull: false}})
         }
     }
 

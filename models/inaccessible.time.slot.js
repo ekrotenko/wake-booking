@@ -1,8 +1,8 @@
 module.exports = (sequelize, DataTypes)=>{
     class InaccessibleTimeSlot extends sequelize.Model{
-        static associate(models){
-            InaccessibleTimeSlot.belongsTo(models.Ropeway, {foreignKey: {name: 'itsId', allowNull: false}});
-        }
+        // static associate(models){
+        //     InaccessibleTimeSlot.belongsTo(models.Ropeway, {foreignKey: {name: 'itsId', allowNull: false}});
+        // }
     }
 
     InaccessibleTimeSlot.init(
