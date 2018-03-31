@@ -6,7 +6,7 @@ const Op = Sequelize.Op;
 module.exports = (sequelize, DataTypes) => {
     class Schedule extends sequelize.Model {
         static associate(models) {
-            Schedule.belongsTo(models.Ropeway);
+            Schedule.belongsTo(models.Ropeway, {foreignKey: 'scheduleId'});
         }
     }
 

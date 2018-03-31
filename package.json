@@ -34,6 +34,7 @@
     "sequelize": "^4.37.5",
     "sequelize-auto-migrations": "^1.0.2",
     "sequelize-cli": "^4.0.0",
+    "sequelize-restful-helper": "^1.0.2",
     "serve-favicon": "~2.4.2",
     "volleyball": "^1.4.1"
   }

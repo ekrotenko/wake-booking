@@ -1,9 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
     class Ropeway extends sequelize.Model {
         static associate(models) {
-            Ropeway.belongsTo(models.Park);
+            Ropeway.belongsTo(models.Park, {foreignKey: 'ropewayId'});
             Ropeway.hasMany(models.Schedule, {foreignKey: {name: 'ropewayId', allowNull: false}});
-            Ropeway.hasMany(models.Order);
+            Ropeway.hasMany(models.Order, {foreignKey: 'ropewayId'});
         }
     }
 

@@ -7,8 +7,8 @@ const dateFormat = 'YYYY-MM-DD';
 module.exports = (sequelize, DataTypes) => {
     class Order extends sequelize.Model {
         static associate(models) {
-            Order.belongsTo(models.User, {foreignKey: {allowNull: false}});
-            Order.belongsTo(models.Ropeway, {foreignKey: {allowNull: false}});
+            Order.belongsTo(models.User, {foreignKey: {allowNull: false, name: 'orderId'}});
+            Order.belongsTo(models.Ropeway, {foreignKey: {allowNull: false, name: 'orderId'}});
         }
     }
 

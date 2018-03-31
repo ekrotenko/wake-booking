@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) =>{
     class Park extends sequelize.Model{
         static associate(models){
             Park.hasMany(models.Ropeway, {foreignKey: {name: 'parkId', allowNull: false}});
-            Park.belongsToMany(models.User, {as: 'admin', through: 'parks_users'});
+            Park.belongsToMany(models.User, {as: 'admin', through: 'parks_users', foreignKey:'userId'});
         }
     }
 

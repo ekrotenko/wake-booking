@@ -4,12 +4,15 @@ module.exports = (sequelize, DataTypes) => {
 
     class User extends sequelize.Model {
         static associate(models) {
-            User.belongsToMany(models.Park, {as: 'ownedPark', through: 'parks_users'});
-            User.hasMany(models.Order);
+            User.belongsToMany(models.Park, {as: 'ownedPark', through: 'parks_users', foreignKey: 'parkId'});
+            User.hasMany(models.Order, {foreignKey: 'userId'});
         }
 
         encryptPassword(password) {
-            return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
+            return crypto
+                .createHmac('sha1', this.salt)
+                .update(password)
+                .digest('hex');
             //more secure - return crypto.pbkdf2Sync(password, this.salt, 10000, 512);
         }
 
@@ -68,9 +71,7 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.VIRTUAL,
             set(password) {
-                this.setDataValue('salt', crypto.randomBytes(128).toString('base64'));
                 this.setDataValue('password', password);
-                this.setDataValue('hashedPassword', this.encryptPassword(password));
             },
             validate: {
                 is: {
@@ -84,6 +85,10 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'users',
         paranoid: true,
         hooks: {
+            beforeValidate: user => {
+                user.salt = crypto.randomBytes(128).toString('base64');
+                user.hashedPassword = user.encryptPassword(user.password);
+            },
             afterValidate: user => {
                 if (user.isOwner)
                     user.isAdmin = true;
