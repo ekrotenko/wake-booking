@@ -6,7 +6,9 @@
     "docker:dev": "docker-compose -f docker-compose.dev.yml up",
     "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
     "migrate:local": "sequelize db:migrate --env local",
-    "seed:local": "sequelize db:seed:all --env local",
+    "seed:all:local": "sequelize db:seed:all --env local",
+    "seed:undo:all:local": "sequelize db:seed:undo:all --env local",
+
     "debug": "nodemon --inspect=0.0.0.0:5858 app.js",
     "start": "nodemon app.js",
     "start:local": "export NODE_ENV=local && npm run start",

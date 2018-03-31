@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
                 len: [3, 30]
             }
         },
+        // TODO: make field not updatable
         email: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -50,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             // Making `.hashedPassword` act like a function hides it when serializing to JSON.
             // This is a hack to get around Sequelize's lack of a "private" option.
-            get(){
+            get() {
                 return () => this.getDataValue('hashedPassword');
             }
         },
@@ -74,7 +75,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             // Making `.salt` act like a function hides it when serializing to JSON.
             // This is a hack to get around Sequelize's lack of a "private" option.
-            get(){
+            get() {
                 return () => this.getDataValue('salt');
             }
         },
@@ -83,7 +84,7 @@ module.exports = (sequelize, DataTypes) => {
             set(password) {
                 this.setDataValue('password', password);
             },
-            get(){
+            get() {
                 return () => this.getDataValue('password');
             },
             validate: {
@@ -99,8 +100,10 @@ module.exports = (sequelize, DataTypes) => {
         paranoid: true,
         hooks: {
             beforeValidate: user => {
-                user.salt = crypto.randomBytes(128).toString('base64');
-                user.hashedPassword = user.encryptPassword(user.password());
+                if (user.password()) {
+                    user.salt = crypto.randomBytes(128).toString('base64');
+                    user.hashedPassword = user.encryptPassword(user.password());
+                }
             },
             afterValidate: user => {
                 if (user.isOwner)
