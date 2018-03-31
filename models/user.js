@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
 
         encryptPassword(password) {
             return crypto
-                .createHmac('sha1', this.salt)
+                .createHmac('sha1', this.salt())
                 .update(password)
                 .digest('hex');
             //more secure - return crypto.pbkdf2Sync(password, this.salt, 10000, 512);
@@ -48,6 +48,11 @@ module.exports = (sequelize, DataTypes) => {
         hashedPassword: {
             type: DataTypes.STRING,
             allowNull: false,
+            // Making `.hashedPassword` act like a function hides it when serializing to JSON.
+            // This is a hack to get around Sequelize's lack of a "private" option.
+            get(){
+                return () => this.getDataValue('hashedPassword');
+            }
         },
         phone: {
             type: DataTypes.STRING,
@@ -67,11 +72,19 @@ module.exports = (sequelize, DataTypes) => {
         salt: {
             type: DataTypes.STRING,
             allowNull: false,
+            // Making `.salt` act like a function hides it when serializing to JSON.
+            // This is a hack to get around Sequelize's lack of a "private" option.
+            get(){
+                return () => this.getDataValue('salt');
+            }
         },
         password: {
             type: DataTypes.VIRTUAL,
             set(password) {
                 this.setDataValue('password', password);
+            },
+            get(){
+                return () => this.getDataValue('password');
             },
             validate: {
                 is: {
@@ -87,7 +100,7 @@ module.exports = (sequelize, DataTypes) => {
         hooks: {
             beforeValidate: user => {
                 user.salt = crypto.randomBytes(128).toString('base64');
-                user.hashedPassword = user.encryptPassword(user.password);
+                user.hashedPassword = user.encryptPassword(user.password());
             },
             afterValidate: user => {
                 if (user.isOwner)
