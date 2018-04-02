@@ -6,13 +6,13 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 const MaskHelpers = require('./mask.helpers');
-const Blocker = require('../models/Blocker');
+const Blocker = require('../models/inaccessible.time.slot');
 
 const timeFormat = 'HH:mm';
 
-class BlockerHelpers {
+class InaccessibleTimeSlotsHelpers {
 
-    static getBlockers(ropewayId, date) {
+    static getInaccessibleTimeSlots(ropewayId, date) {
         return Blocker.findAll({
             where: {
                 ropewayId: {[Op.eq]: ropewayId},
@@ -35,8 +35,8 @@ class BlockerHelpers {
             })
     }
 
-    static getBlockerIntersections(reqBlocker) {
-        const Blocker = require('../models/Blocker');
+    static getInaccessibleTimeSlotsIntersections(reqBlocker) {
+        const Blocker = require('../models/inaccessible.time.slot');
         return Blocker.findAll({
             where: {
                 ropewayId: {[Op.eq]: reqBlocker.ropewayId},
@@ -98,4 +98,4 @@ function _parseRecurrings(recurrings) {
     return parseResult;
 }
 
-module.exports = BlockerHelpers;
+module.exports = InaccessibleTimeSlotsHelpers;

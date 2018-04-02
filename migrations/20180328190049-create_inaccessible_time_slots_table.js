@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-      await queryInterface.createTable('inaccessibleSlots', {
+      await queryInterface.createTable('inaccessible_time_slots', {
           id: {
               type: Sequelize.INTEGER,
               primaryKey: true,
@@ -22,6 +22,10 @@ module.exports = {
           },
           description: {
               type: Sequelize.STRING,
+              allowNull: true,
+          },
+          type: {
+              type: Sequelize.ENUM(['disposable', 'recurring']),
               allowNull: false,
           },
           dateFrom: {
@@ -58,6 +62,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-      await queryInterface.createTable('inaccessibleSlots', {});
+      await queryInterface.dropTable('inaccessible_time_slots', {});
   }
 };

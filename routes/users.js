@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const User = require('../models/user');
-const Park = require('../models/park');
+const User = require('../models').User;
+const Park = require('../models').Park;
 
 router.param('id', (req, res, next, id) => {
     User.findById(id, {

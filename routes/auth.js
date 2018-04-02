@@ -24,7 +24,7 @@ router.post('/token', (req, res, next) => {
                     owner: user.isOwner,
                     updatedAt: user.updatedAt
                 };
-                const token = jwt.encode(payload, config.security.jwt.jwtSecret'));
+                const token = jwt.encode(payload, config.security.jwt.jwtSecret);
                 res.json({
                     token: token
                 });
