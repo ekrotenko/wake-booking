@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const User = require('../models').User;
 const Park = require('../models').Park;
+const UsersController = require('../controllers/users.controller');
 
 router.param('id', (req, res, next, id) => {
     User.findById(id, {
@@ -17,13 +18,7 @@ router.param('id', (req, res, next, id) => {
 });
 
 // get all users
-router.get('/', (req, res, next) => {
-    User.findAll({
-        include: [{model: Park, as: 'ownedPark'}]
-    })
-        .then(res.send.bind(res))
-        .catch(next);
-});
+router.get('/', UsersController.getAll.bind(UsersController));
 
 // get user by id
 router.get('/:id', (req, res, next) => {
