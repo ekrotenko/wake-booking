@@ -58,6 +58,20 @@ const parkData = [
         updatedAt: new Date()
     },
     {
+        name: 'Hart Attack',
+        country: 'Ukraine',
+        city: 'Poltava',
+        zipCode: '45668',
+        address: 'Ozernaya 18',
+        phone: '0501234567',
+        email: faker.internet.email(),
+        website: 'http://ha.com.ua',
+        latitude: '2345463',
+        longitude: '3948578',
+        createdAt: new Date(),
+        updatedAt: new Date()
+    },
+    {
         name: 'South Park',
         country: 'Ukraine',
         city: 'Kherson',

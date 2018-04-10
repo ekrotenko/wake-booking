@@ -98,6 +98,18 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         tableName: 'users',
         paranoid: true,
+        scopes:{
+            parkOwners(){
+                return {
+                    include:[{
+                        association: User.associations.ownedPark,
+                        where: {
+                            isOwner: true
+                        }
+                    }]
+                }
+            }
+        },
         hooks: {
             beforeValidate: user => {
                 if (user.password()) {

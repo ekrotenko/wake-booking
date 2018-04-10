@@ -1,13 +1,8 @@
 // importing Bluebird promises so we can Promise.map
 const Promise = require('bluebird');
 // bring in the db and all the Models to seed
-const db = require('./db_old');
-const Ropeway = require('./models/ropeway');
-const Park = require('./models/park');
-const Schedule = require('./models/schedule');
+const db = require('./models');
 const Order = require('./models/order');
-const User = require('./models/user');
-const InaccessibleSlot = require('./models/inaccessible.slot');
 const faker = require('faker');
 
 // each of the following array will be iterated and Created
@@ -295,31 +290,31 @@ const parkData = [
     },
 ];
 
-// We will go through the Models one by one and create an instance
+// We will go through the Models one by one and createPark an instance
 // for each element in the array. Look below for a commented out version of how to do this in one slick nested Promise.
 
 // Sync and restart db before seeding
-db.sync({force: true})
+db.sequelize.sync({force: true})
     .then(() => {
         console.log('synced DB and dropped old data');
     })
-    // here, we go through all the models one by one, create each
+    // here, we go through all the models one by one, createPark each
     // element from the seed arrays above, and log how many are created
 
     .then(() => {
-        return Promise.map(userData, user => User.create(user))
+        return Promise.map(userData, user => db.User.create(user))
     })
     .then(createdUsers => {
         console.log(`${createdUsers.length} users created`);
     })
     // .then(() => {
-    //     return Promise.map(orderData, order => Order.create(order))
+    //     return Promise.map(orderData, order => Order.createPark(order))
     // })
     // .then(createdOrders => {
     //     console.log(`${createdOrders.length} orders created`);
     // })
     .then(() => {
-        return Promise.map(parkData, park => Park.create(park))
+        return Promise.map(parkData, park => db.Park.create(park))
     })
     .then(createdParks => {
         console.log(`${createdParks.length} parks created`);
@@ -327,7 +322,7 @@ db.sync({force: true})
 
     .then(() => {
         return Promise.map(ropewayData, function (ropeway) {
-            return Ropeway.create(ropeway);
+            return db.Ropeway.create(ropeway);
         })
     })
     .then(createdRopeways => {
@@ -336,14 +331,14 @@ db.sync({force: true})
 
     .then(() => {
         return Promise.map(scheduleData, function (schedule) {
-            return Schedule.create(schedule);
+            return db.Schedule.create(schedule);
         })
     })
     .then(createdSchedules => {
         console.log(`${createdSchedules.length} schedules created`)
     })
     .then(() => {
-        return Promise.map(inaccessibleSlotsData, inaccessibleSlot => InaccessibleSlot.create(inaccessibleSlot))
+        return Promise.map(inaccessibleSlotsData, inaccessibleSlot => db.InaccessibleTimeSlot.create(inaccessibleSlot))
     })
     .then(createdUns => {
         console.log(`${createdUns.length} unavailabilities created`);
@@ -355,7 +350,7 @@ db.sync({force: true})
         console.error('Error!', err, err.stack);
     })
     .finally(() => {
-        db.close();
+        db.sequelize.close();
         console.log('Finished!');
         return null;
     });

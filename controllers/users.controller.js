@@ -1,25 +1,33 @@
-const RestfulHelper = require('sequelize-restful-helper');
-const Bluebird = require('bluebird');
-const models = require('../models');
+const usersService = require('../services/users.service');
 
 class UsersController {
-    constructor(usersModel){
-        this._usersModel = usersModel;
+    constructor(usersService) {
+        this._usersService = usersService;
     }
-    async getAll(req, res){
-        const restfulHelper = new RestfulHelper(req.query, {
-            allowedFilters: ['id', 'username', 'isOwner', 'isAdmin'],
-            allowedOrder: ['id'],
-            model: this._usersModel
-        });
 
-        const params = restfulHelper.getSequelizeOptions();
-
-        const dbRes = await this._usersModel.findAll(params);
-
-        return res.send(dbRes);
-
+    async getAll(req, res) {
+        res.status(200).json(await this._usersService.getAllUsers());
     }
+
+    async getUserById(req, res, next) {
+        const user = await this._usersService.getUserById(req.params.id);
+        if (!user) {
+            res.status(404).send('Not found');
+        }
+        req.user = user;
+        next();
+    }
+
+    async updateUserData(req, res, next) {
+        res.status(200).json(await this._usersService.updateUserData(req.params.id, req.body)
+            .catch(next));
+    }
+
+    async createUser(req, res, next) {
+        res.status(201).json(await this._usersService.createUser(req.body)
+            .catch(next));
+    }
+
 }
 
-module.exports = new UsersController(models.User);
+module.exports = new UsersController(usersService);
