@@ -7,9 +7,9 @@ const config = require('./config/app');
 const auth = require('./libs/auth')();
 
 // Routers:
-const parksRouter = require('./routes/parks');
-const usersRouter = require('./routes/users');
-const ropewaysRouter = require('./routes/ropeways');
+const parksRouter = require('./routes/parks.router');
+const usersRouter = require('./routes/users.router');
+const ropewaysRouter = require('./routes/ropeways.router');
 const ordersRouter = require('./routes/orders');
 const schedules = require('./routes/schedules');
 const inaccessibleSlots = require('./routes/inaccessible.time.slots');

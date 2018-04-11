@@ -73,7 +73,12 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         sequelize,
         tableName: 'parks',
-        paranoid: true
+        paranoid: true,
+        // defaultScope: {
+        //     include: [{
+        //         association: Park.associations.Ropeway,
+        //     }]
+        // }
     });
 
     return Park;
