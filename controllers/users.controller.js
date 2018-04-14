@@ -14,17 +14,21 @@ class UsersController {
         if (!user) {
             res.status(404).send('Not found');
         }
-        req.user = user;
-        next();
+        else {
+            req.user = user;
+            next();
+        }
     }
 
     async updateUserData(req, res, next) {
-        res.status(200).json(await this._usersService.updateUserData(req.params.id, req.body)
+        res.send(await this._usersService
+            .updateUserData(req.params.id, req.body)
             .catch(next));
     }
 
     async createUser(req, res, next) {
-        res.status(201).json(await this._usersService.createUser(req.body)
+        res.send(await this._usersService
+            .createUser(req.body)
             .catch(next));
     }
 

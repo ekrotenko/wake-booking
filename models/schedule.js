@@ -75,6 +75,7 @@ module.exports = (sequelize, DataTypes) => {
                 })
                     .then(schedules => {
                         if (schedules.length) {
+                            // FIXME: fix add schedule after some one
                             const intersections = schedules.filter(sc => {
                                 return moment(sc.dateFrom).isSameOrBefore(moment(this.dateFrom)) ||
                                     moment(sc.dateTo).isSameOrAfter(moment(this.dateTo));

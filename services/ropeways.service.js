@@ -11,20 +11,21 @@ class RopewaysService {
         });
     }
 
-    async getAllRopeways(){
+    async getAllRopeways() {
         return this._ropewaysModel.findAll();
     }
 
-    async updateRopeway(ropeway, body){
-        if(body.hasOwnProperty('parkId')){
+    async updateRopeway(ropeway, body) {
+        if (body.hasOwnProperty('parkId')) {
             delete body.parkId;
         }
         return ropeway.update(body);
     }
 
-    async deleteRopeway(ropeway){
+    async deleteRopeway(ropeway) {
         return ropeway.destroy();
     }
 }
 
 module.exports = new RopewaysService(Ropeway);
+

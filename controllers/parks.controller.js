@@ -8,7 +8,7 @@ class ParksController {
     }
 
     async getAllParks(req, res) {
-        res.status(200).json(await this._parksService.getAllParks());
+        res.send(await this._parksService.getAllParks());
     }
 
     async setParkParam(req, res, next) {
@@ -16,41 +16,49 @@ class ParksController {
         if (!park) {
             res.status(404).send('Not found');
         }
-        req.park = park;
-        next();
+        else {
+            req.park = park;
+            next();
+        }
     }
 
     async getParkById(req, res) {
-        res.status(200).json(req.park);
+        res.send(req.park);
     }
 
     async updateParkData(req, res, next) {
-        res.status(200).json(await this._parksService.updateParkData(req.params.id, req.body)
+        res.send(await this._parksService
+            .updateParkData(req.params.id, req.body)
             .catch(next));
     }
 
     async createPark(req, res, next) {
-        res.status(201).json(await this._parksService.createPark(req.body)
+        res.send(await this._parksService
+            .createPark(req.body)
             .catch(next));
     }
 
     async deletePark(req, res, next) {
-        res.status(200).json(await this._parksService.deletePark(req.park)
-            .catch(next))
+        res.send(await this._parksService
+            .deletePark(req.park)
+            .catch(next));
     }
 
     async removeAdmin(req, res, next) {
-        res.status(200).json(await this._parksUsersService.removeAdmin(req.park, req.params.userId)
-            .catch(next))
+        res.send(await this._parksUsersService
+            .removeAdmin(req.park, req.params.userId)
+            .catch(next));
     }
 
     async addAdmin(req, res, next) {
-        res.status(200).json(await this._parksUsersService.addParkAdmin(req.park, req.params.userId)
+        res.send(await this._parksUsersService
+            .addParkAdmin(req.park, req.params.userId)
             .catch(next));
     }
 
     async addOwner(req, res, next) {
-        res.status(200).json(await this._parksUsersService.addParkOwner(req.park, req.params.userId)
+        res.send(await this._parksUsersService
+            .addParkOwner(req.park, req.params.userId)
             .catch(next));
     }
 }
