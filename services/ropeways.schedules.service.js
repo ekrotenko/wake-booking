@@ -26,6 +26,8 @@ class RopewaysSchedulesService {
 
         return ropeway.getSchedules();
     }
+
+
 }
 
 module.exports = new RopewaysSchedulesService(ropewaysService);

@@ -1,4 +1,4 @@
-const scheduleService = require('../services/schedule.service');
+const scheduleService = require('../services/schedules.service');
 const ropewaysSchedulesService = require('../services/ropeways.schedules.service')
 
 class SchedulesController {

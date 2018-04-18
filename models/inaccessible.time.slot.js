@@ -1,5 +1,5 @@
-module.exports = (sequelize, DataTypes)=>{
-    class InaccessibleTimeSlot extends sequelize.Model{
+module.exports = (sequelize, DataTypes) => {
+    class InaccessibleTimeSlot extends sequelize.Model {
     }
 
     InaccessibleTimeSlot.init(
@@ -65,6 +65,23 @@ module.exports = (sequelize, DataTypes)=>{
             sequelize,
             tableName: 'inaccessible_time_slots',
             paranoid: true,
+            scopes: {
+                belongsToRopeway(ropewayId) {
+                    return {
+                        where: {
+                            ropewayId: {[sequelize.Op.eq]: ropewayId},
+                        }
+                    }
+                },
+                includesDate(date) {
+                    return {
+                        where: {
+                            dateFrom: {[sequelize.Op.lte]: new Date(date)},
+                            dateTo: {[sequelize.Op.gte]: new Date(date)}
+                        }
+                    }
+                }
+            }
         }
     );
 

@@ -1,6 +1,4 @@
-const Sequelize = require('sequelize');
 const moment = require('moment');
-const Op = Sequelize.Op;
 // TODO: add order add/cancel time options
 
 module.exports = (sequelize, DataTypes) => {
@@ -68,10 +66,27 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         tableName: 'schedules',
         paranoid: true,
+        scopes: {
+            belongsToRopeway(ropewayId) {
+                return {
+                    where: {
+                        ropewayId: {[sequelize.Op.eq]: ropewayId},
+                    }
+                }
+            },
+            includesDate(date) {
+                return {
+                    where: {
+                        dateFrom: {[sequelize.Op.lte]: new Date(date)},
+                        dateTo: {[sequelize.Op.gte]: new Date(date)}
+                    }
+                }
+            }
+        },
         validate: {
             isIntersected() {
                 return Schedule.findAll({
-                    where: {ropewayId: {[Op.eq]: this.ropewayId}}
+                    where: {ropewayId: {[sequelize.Op.eq]: this.ropewayId}}
                 })
                     .then(schedules => {
                         if (schedules.length) {

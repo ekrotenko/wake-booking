@@ -62,6 +62,22 @@ module.exports = (sequelize, DataTypes) => {
             sequelize,
             tableName: 'orders',
             paranoid: true,
+            scopes: {
+                belongsToRopeway(ropewayId) {
+                    return {
+                        where: {
+                            ropewayId: {[sequelize.Op.eq]: ropewayId},
+                        }
+                    }
+                },
+                orderDate(date) {
+                    return {
+                        where: {
+                            date: {[sequelize.Op.eq]: new Date(date)}
+                        }
+                    }
+                }
+            },
             hooks: {
                 beforeCreate: (order, options) => {
                     order.schedule = undefined;
@@ -69,38 +85,6 @@ module.exports = (sequelize, DataTypes) => {
                 }
 
             },
-            validate: {
-                verifyScheduleRange() {
-                    if (moment(this.startAt, timeFormat).isBefore(moment(this.schedule.timeFrom, timeFormat)) ||
-                        moment(this.endAt, timeFormat).isAfter(moment(this.schedule.timeTo, timeFormat))) {
-                        throw new Error('Start/end time is out of park schedule');
-                    }
-                },
-                verifyDuration() {
-                    const slotDuration = SchedulerHelpers.getDuration(this.startAt, this.endAt);
-
-                    if (slotDuration % this.schedule.duration > 0) {
-                        throw new Error(`Duration should be a multiple of ${this.schedule.duration} minutes`);
-                    }
-                },
-                verifyTimeSlot() {
-                    return SchedulerHelpers.getTimeSlots(this)
-                        .then(allSlots => {
-                            if (!allSlots.find(slot => slot.time === this.startAt)) {
-                                throw new Error('Schedule interval mismatch');
-                            }
-
-                            const matches = allSlots.filter(slot => {
-                                const slotTime = moment(slot.time, timeFormat).add(1, 'minutes');
-                                const start = moment(this.startAt, timeFormat);
-                                const end = moment(this.endAt, timeFormat);
-                                return moment(slotTime).isBetween(start, end, 'minutes') && !slot.available;
-                            });
-                            if (!!matches.length)
-                                throw new Error('This time slot is not available');
-                        })
-                }
-            }
         });
 
     return Order;
