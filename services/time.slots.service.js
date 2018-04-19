@@ -18,35 +18,80 @@ class TimeSlotsService {
     async getRopewayTimeSlotsByDate(ropewayId, date) {
         const schedule = await this.configureSchedule(ropewayId, date);
 
-        return scheduler.getAvailability(schedule)[`${date}`];
+        return scheduler.getAvailability(schedule)[date];
     }
 
     async configureSchedule(ropewayId, date) {
-        const orders = await this._ordersService.getRopewayOrdersByDate(ropewayId, date);
-        const inaccessibleSlots = await this._inaccessibleSlotsService
-            .getRopewayInaccessibleSlotsByDate(ropewayId, date);
         const scheduleDataSet = await this._scheduleService.getRopewayScheduleByDate(ropewayId, date);
-        const schedule = this._parseSchedule(scheduleDataSet);
+        const inaccessibleSlots = await this._getUnavailability(ropewayId, date);
+        const weeklySchedule = this._getWeeklySchedule(scheduleDataSet);
+        const allocations = await this._getAllocations(ropewayId, date);
 
-        for (let key of schedule) {
-            if (schedule.hasOwnProperty(key)) {
-                schedule[key].unavailability = inaccessibleSlots.recurring[`${key}`] || [];
-            }
+        for (let key in weeklySchedule) {
+            weeklySchedule[key].unavailability = inaccessibleSlots.recurring[key] || [];
         }
 
-        schedule.allocated = this._getAllocations(orders);
-        schedule.unavailability = inaccessibleSlots.disposable;
+        weeklySchedule.allocated = allocations;
+        weeklySchedule.unavailability = inaccessibleSlots.disposable;
 
         return {
             from: date,
             to: moment(date).add(1, 'days').format(dateFormat),
             duration: scheduleDataSet.duration,
             interval: scheduleDataSet.interval,
-            schedule
+            schedule: weeklySchedule
         };
     }
 
-    _getAllocations(orders) {
+    async _getUnavailability(ropewayId, date) {
+        const ropewayInaccessibleSlots = await this._inaccessibleSlotsService
+            .getRopewayInaccessibleSlotsByDate(ropewayId, date);
+        const filteredSlots = {};
+
+        filteredSlots.disposable = this._parseDisposableTimeSlots(ropewayInaccessibleSlots.filter(slot => {
+            return slot.type === 'disposable';
+        }));
+
+        filteredSlots.recurring = this._parseRecurringTimeSlots(ropewayInaccessibleSlots.filter(slot => {
+            return slot.type === 'recurring';
+        }));
+
+        return filteredSlots;
+    }
+
+    _parseDisposableTimeSlots(disposables) {
+        return disposables.map(inaccessibleSlots => {
+            return {
+                from: `${inaccessibleSlots.dateFrom} ${inaccessibleSlots.timeFrom}`,
+                to: `${inaccessibleSlots.dateTo} ${inaccessibleSlots.timeTo}`
+            }
+        })
+
+    }
+
+    _parseRecurringTimeSlots(recurrings) {
+        const parseResult = {};
+
+        recurrings.forEach(setting => {
+            this._maskToArray(setting.weekMask).forEach((day, index) => {
+                const weekDay = moment.weekdays(index).toLowerCase();
+
+                parseResult[`${weekDay}`] = (!parseResult[`${weekDay}`]) ? [] : parseResult[`${weekDay}`];
+
+                if (day > 0) {
+                    parseResult[`${weekDay}`].push({
+                        from: setting.timeFrom,
+                        to: setting.timeTo
+                    })
+                }
+            })
+        });
+
+        return parseResult;
+    }
+
+    async _getAllocations(ropewayId, date) {
+        const orders = await this._ordersService.getRopewayOrdersByDate(ropewayId, date);
         return orders.map(order => {
             return {
                 from: `${order.date} ${order.startAt}`,
@@ -60,16 +105,16 @@ class TimeSlotsService {
             .diff(moment(from, timeFormat)), 'ms').asMinutes();
     }
 
-    _parseSchedule(schedule) {
-        const parseResult = new Map();
+    _getWeeklySchedule(schedule) {
+        const parseResult = {};
         this._maskToArray(schedule.weekMask).forEach((day, index) => {
             const weekDay = moment.weekdays(index).toLowerCase();
 
             if (day > 0) {
-                parseResult[`${weekDay}`] = {
+                parseResult[weekDay] = {
                     from: schedule.timeFrom,
                     to: schedule.timeTo,
-                }
+                };
             }
         });
 

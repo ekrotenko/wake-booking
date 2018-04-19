@@ -1,5 +1,8 @@
 const {InaccessibleTimeSlot} = require('../models');
 const ropewaysService = require('./ropeways.service');
+const moment = require('moment');
+const timeFormat = 'HH:mm';
+const dateFormat = 'YYYY-MM-DD';
 
 class InaccessibleTimeSlotsService {
     constructor(itsModel, ropewaysService) {
@@ -30,6 +33,13 @@ class InaccessibleTimeSlotsService {
             throw error;
         }
 
+        const slotsIntersections = await this.getInaccessibleTimeSlotsIntersections(body);
+        if(slotsIntersections.length>0){
+            const error = new Error('Inaccessible time is intersected');
+            error.status = 422;
+            throw error;
+        }
+        // TODO: Check intersections
         return ropeway.createInaccessibleTimeSlot(body);
     }
 
@@ -57,51 +67,28 @@ class InaccessibleTimeSlotsService {
         ]).findAll();
     }
 
-    async filterInaccessibleTimeSlots(ropewayInaccessibleSlots) {
-        const filteredSlots = new Map();
+    async getInaccessibleTimeSlotsIntersections(body) {
+        const inaccessibleSlots = this._inaccessibleTimeSlotModel.scope(
+            [
+                {method: ['belongsToRopeway', body.ropewayId]},
+                {method: ['intersectsDates', body.dateFrom, body.dateTo]}
+            ]
+        ).findAll();
 
-        filteredSlots.disposable = this._parseDisposableTimeSlots(ropewayInaccessibleSlots.filter(slot => {
-            return slot.type === 'disposable';
-        }));
+        return inaccessibleSlots.filter(slot => {
+            const slotTimeFrom = moment(slot.timeFrom, 'HH:mm:ss');
+            const slotTimeTo = moment(slot.timeTo, 'HH:mm:ss').subtract(1, 'second');
+            const bodyTimeFrom = moment(body.timeFrom, timeFormat);
+            const bodyTimeTo = moment(body.timeTo, timeFormat);
 
-        filteredSlots.recurring = this._parseRecurringTimeSlots(ropewayInaccessibleSlots.filter(slot => {
-            return slot.type === 'recurring';
-        }));
+            const bodyRange = moment.range(bodyTimeFrom, bodyTimeTo);
 
-        return filteredSlots;
-    }
-
-    _parseDisposableTimeSlots(disposables) {
-        return disposables.map(inaccessibleSlots => {
-            return {
-                from: `${inaccessibleSlots.dateFrom} ${inaccessibleSlots.timeFrom}`,
-                to: `${inaccessibleSlots.dateTo} ${inaccessibleSlots.timeTo}`
+            if (bodyRange.contains(slotTimeFrom) || bodyRange.contains(slotTimeTo)) {
+                return (slot.type === 'disposable') ||
+                    (slot.type === 'recurring' && (slot.weekMask & body.weekMask) > 0)
             }
-        })
-
-    }
-
-    _parseRecurringTimeSlots(recurrings) {
-        const parseResult = {};
-
-        recurrings.forEach(setting => {
-            _maskToArray(setting.weekMask).forEach((day, index) => {
-                const weekDay = moment.weekdays(index).toLowerCase();
-
-                parseResult[`${weekDay}`] = (!parseResult[`${weekDay}`]) ? [] : parseResult[`${weekDay}`];
-
-                if (day > 0) {
-                    parseResult[`${weekDay}`].push({
-                        from: setting.timeFrom,
-                        to: setting.timeTo
-                    })
-                }
-            })
         });
-
-        return parseResult;
     }
 }
 
 module.exports = new InaccessibleTimeSlotsService(InaccessibleTimeSlot, ropewaysService);
-

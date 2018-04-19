@@ -80,8 +80,22 @@ module.exports = (sequelize, DataTypes) => {
                             dateTo: {[sequelize.Op.gte]: new Date(date)}
                         }
                     }
+                },
+                intersectsDates(dateFrom, dateTo){
+                    return {
+                        where: {
+                            [sequelize.Op.or]: {
+                                dateFrom: {
+                                    [sequelize.Op.between]: [new Date(dateFrom), new Date(dateTo)]
+                                },
+                                dateTo: {
+                                    [sequelize.Op.between]: [new Date(dateFrom), new Date(dateTo)]
+                                }
+                            }
+                        }
+                    }
                 }
-            }
+            },
         }
     );
 

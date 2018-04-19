@@ -1,12 +1,7 @@
 const {Order} = require('../models');
 
-
-const moment = require('moment');
-const timeFormat = 'HH:mm';
-const dateFormat = 'YYYY-MM-DD';
-
 class OrderService {
-    constructor(orderModel, orderValidationService, timeSlotsService) {
+    constructor(orderModel) {
         this._orderModel = orderModel;
 
     }
