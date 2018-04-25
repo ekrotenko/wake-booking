@@ -1,17 +1,17 @@
-'use strict';
+/* eslint-disable */
 
 const path = require('path');
-const config = require(__dirname + '/../config/database.js');
+const config = require(`${__dirname}/../config/database.js`);
 const basename = path.basename(__filename);
 const Sequelize = require('sequelize');
 
 const db = {};
 
-const sequelize  = new Sequelize(config.database, config.username, config.password, {
-    host: config.host,
-    dialect: config.dialect,
-    logging: false,
-    operatorsAliases: Sequelize.Op
+const sequelize = new Sequelize(config.database, config.username, config.password, {
+  host: config.host,
+  dialect: config.dialect,
+  logging: false,
+  operatorsAliases: Sequelize.Op,
 });
 
 // if (config.use_env_variable) {
@@ -21,19 +21,17 @@ const sequelize  = new Sequelize(config.database, config.username, config.passwo
 // }
 
 require('fs')
-    .readdirSync(__dirname)
-    .filter(file => {
-        return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
-    })
-    .forEach(file => {
-        const model = sequelize.import(path.join(__dirname, file));
-        db[model.name] = model;
-    });
+  .readdirSync(__dirname)
+  .filter(file => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
+  .forEach((file) => {
+    const model = sequelize.import(path.join(__dirname, file));
+    db[model.name] = model;
+  });
 
-Object.keys(db).forEach(modelName => {
-    if (db[modelName].associate) {
-        db[modelName].associate(db);
-    }
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
 });
 
 db.sequelize = sequelize;

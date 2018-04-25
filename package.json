@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "precommit": "npm run lint",
+    "lint": "./node_modules/.bin/eslint ./*/**.js *.js",
+    "lint:fix": "./node_modules/.bin/eslint ./*/**.js *.js --fix",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up",
     "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
     "migrate": "sequelize db:migrate",
@@ -10,6 +13,7 @@
     "seed:all": "sequelize db:seed:all",
     "seed:undo:all": "sequelize db:seed:undo:all",
     "debug": "nodemon --inspect=0.0.0.0:5858 app.js",
+    "prestart": "npm run lint:fix",
     "start": "nodemon app.js",
     "start:local": "export NODE_ENV=local && npm run start",
     "seed": "node seed.js"
@@ -41,5 +45,12 @@
     "sequelize-restful-helper": "^1.0.2",
     "serve-favicon": "~2.4.2",
     "volleyball": "^1.4.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-import": "^2.11.0",
+    "husky": "^0.14.3"
   }
 }

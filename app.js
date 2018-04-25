@@ -1,7 +1,8 @@
+require('express-promise');
+
 const express = require('express');
 const volleyball = require('volleyball');
 const bodyParser = require('body-parser');
-const db = require('./models');
 const path = require('path');
 const config = require('./config/app');
 const auth = require('./libs/auth')();
@@ -10,8 +11,8 @@ const auth = require('./libs/auth')();
 const parksRouter = require('./routes/parks.router');
 const usersRouter = require('./routes/users.router');
 const ropewaysRouter = require('./routes/ropeways.router');
-const ordersRouter = require('./routes/orders');
-const schedules = require('./routes/schedules');
+const ordersRouter = require('./routes/orders.router');
+const schedules = require('./routes/schedules.router');
 const inaccessibleSlots = require('./routes/inaccessible.time.slots.router');
 const authRoute = require('./routes/auth');
 
@@ -21,7 +22,7 @@ const app = express();
 app.use(volleyball);
 // parse request body
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -34,27 +35,27 @@ app.use('/users', usersRouter);
 app.use('/ropeways', ropewaysRouter);
 app.use('/orders', ordersRouter);
 app.use('/schedules', schedules);
-app.use('/inaccessibleSlots', inaccessibleSlots);
+app.use('/inaccessible_slots', inaccessibleSlots);
 
-app.use('*', (req, res, next) => {
-    res.send('This is default route')
+app.use('*', (req, res) => {
+  res.send('This is default route');
 });
 app.use((err, req, res, next) => {
-    if (err.name === 'SequelizeValidationError') {
-        err.status = 422;
-    }
-    res.status(err.status || 500).send(err.message);
-    next();
+  if (err.name === 'SequelizeValidationError') {
+    err.status = 422;
+  }
+  res.status(err.status || 500).send(err.message);
+  next();
 });
 
-let server = app.listen(config.port, () => {
-    console.log('Listening on port:', server.address().port);
-    // db.sync({force: false})
-    //     .then(() => {
-    //         console.log('...DB is synced')
-    //     })
-    //     .catch(function (error) {
-    //         throw error;
-    //     });
+const server = app.listen(config.port, () => {
+  console.log('Listening on port:', server.address().port);
+  // db.sync({force: false})
+  //     .then(() => {
+  //         console.log('...DB is synced')
+  //     })
+  //     .catch(function (error) {
+  //         throw error;
+  //     });
 });
 
