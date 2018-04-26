@@ -9,14 +9,18 @@ class UsersController {
     res.status(200).json(await this.usersService.getAllUsers());
   }
 
-  async getUserById(req, res, next) {
-    const user = await this.usersService.getUserById(req.params.id);
+  async setUserParam(req, res, next, id) {
+    const user = await this.usersService.getUserById(id);
     if (!user) {
       res.status(404).send('Not found');
     } else {
       req.user = user;
       next();
     }
+  }
+
+  async getUserById(req, res) {
+    res.status(200).send(req.user);
   }
 
   async updateUserData(req, res, next) {
@@ -26,7 +30,7 @@ class UsersController {
   }
 
   async createUser(req, res, next) {
-    res.send(await this.usersService
+    res.status(201).send(await this.usersService
       .createUser(req.body)
       .catch(next));
   }
