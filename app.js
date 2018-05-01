@@ -41,8 +41,15 @@ app.use('*', (req, res) => {
   res.send('This is default route');
 });
 app.use((err, req, res, next) => {
-  if (err.name === 'SequelizeValidationError') {
+  if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
     err.status = 422;
+  }
+
+  if (err.errors) {
+    err.message += ':';
+    err.errors.forEach((e) => {
+      err.message += ` ${e.message}.`;
+    });
   }
   res.status(err.status || 500).send(err.message);
   next();

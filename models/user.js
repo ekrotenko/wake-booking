@@ -35,7 +35,6 @@ module.exports = (sequelize, DataTypes) => {
         len: [3, 30],
       },
     },
-    // TODO: make field not updatable
     email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -58,7 +57,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        min: 10,
+        is: {
+          args: /^\+?[1-9]\d{1,14}$/,
+          msg: 'Incorrect phone number',
+        },
       },
     },
     isAdmin: {
@@ -80,6 +82,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.VIRTUAL,
+      allowNull: false,
       set(password) {
         this.setDataValue('password', password);
       },
