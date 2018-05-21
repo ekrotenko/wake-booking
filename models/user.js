@@ -120,7 +120,9 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       afterValidate: (user) => {
-        if (user.isOwner) { user.isAdmin = true; }
+        if (user.isOwner) {
+          user.isAdmin = true;
+        }
       },
     },
   });

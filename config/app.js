@@ -22,7 +22,7 @@ const appConfig = {
     },
   },
   production: {
-    port: 3000,
+    port: 80,
   },
 };
 

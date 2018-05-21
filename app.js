@@ -45,13 +45,7 @@ app.use((err, req, res, next) => {
     err.status = 422;
   }
 
-  if (err.errors) {
-    err.message += ':';
-    err.errors.forEach((e) => {
-      err.message += ` ${e.message}.`;
-    });
-  }
-  res.status(err.status || 500).send(err.message);
+  res.status(err.status || 500).send(err);
   next();
 });
 
