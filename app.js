@@ -49,14 +49,7 @@ app.use((err, req, res, next) => {
   next();
 });
 
-const server = app.listen(config.port, () => {
+const server = app.listen(process.env.PORT || (config.port), () => {
   console.log('Listening on port:', server.address().port);
-  // db.sync({force: false})
-  //     .then(() => {
-  //         console.log('...DB is synced')
-  //     })
-  //     .catch(function (error) {
-  //         throw error;
-  //     });
 });
 
