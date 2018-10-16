@@ -6,4 +6,4 @@
 
 1. Use command to run application in docker containers `npm run docker:dev`
 2. Run migrations `npm run migrate`
-3. Run seeds `npm run seed:all`
+3. Run seed `npm run seed:all`
