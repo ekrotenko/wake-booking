@@ -58,7 +58,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         is: {
-          args: /^\+?[1-9]\d{1,14}$/,
+          args: /^\+?[1-9]\d{12,14}$/,
           msg: 'Incorrect phone number',
         },
       },
