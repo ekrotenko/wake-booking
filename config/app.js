@@ -22,7 +22,14 @@ const appConfig = {
     },
   },
   production: {
-    port: 3000,
+    security: {
+      jwt: {
+        jwtSecret: process.env.JWT_SECRET,
+        jwtSession: {
+          session: false,
+        },
+      },
+    },
   },
 };
 

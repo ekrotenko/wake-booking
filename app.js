@@ -41,21 +41,15 @@ app.use('*', (req, res) => {
   res.send('This is default route');
 });
 app.use((err, req, res, next) => {
-  if (err.name === 'SequelizeValidationError') {
+  if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
     err.status = 422;
   }
-  res.status(err.status || 500).send(err.message);
+
+  res.status(err.status || 500).send(err);
   next();
 });
 
-const server = app.listen(config.port, () => {
+const server = app.listen(process.env.PORT || (config.port), () => {
   console.log('Listening on port:', server.address().port);
-  // db.sync({force: false})
-  //     .then(() => {
-  //         console.log('...DB is synced')
-  //     })
-  //     .catch(function (error) {
-  //         throw error;
-  //     });
 });
 

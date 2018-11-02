@@ -30,9 +30,12 @@ class UsersController {
   }
 
   async createUser(req, res, next) {
-    res.status(201).send(await this.usersService
-      .createUser(req.body)
-      .catch(next));
+    try {
+      const user = await this.usersService.createUser(req.body);
+      res.status(201).send(user);
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
