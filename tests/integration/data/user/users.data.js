@@ -5,13 +5,22 @@ const randomString = require('random-string');
 module.exports = {
   url: `127.0.0.1:3000/users`,
   randomId: faker.random.number(),
-  newUser: {
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    email: faker.internet.email(),
-    password: 'Juh(*329',
-    phone: faker.phone.phoneNumber(phoneFormat)
+  newUser(){
+    return {
+      firstName: faker.name.firstName(),
+      lastName: faker.name.lastName(),
+      email: faker.internet.email(),
+      password: 'Juh(*329',
+      phone: faker.phone.phoneNumber(phoneFormat)
+    }
   },
+  // userForId: {
+  //   firstName: faker.name.firstName(),
+  //   lastName: faker.name.lastName(),
+  //   email: faker.internet.email(),
+  //   password: 'Juh(*329',
+  //   phone: faker.phone.phoneNumber(phoneFormat)
+  // },
   updateUser: {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
