@@ -20,32 +20,30 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
+  function getValidationForNames(nameType) {
+    const msg = `Incorrect ${nameType}`;
+    return {
+      len: {
+        args: [3, 30],
+        msg,
+      },
+      is: {
+        args: /^[^1-9~`!@#$%^*()_+={}:;"<>,/?|]+$/,
+        msg,
+      },
+    }
+  }
+
   User.init({
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        len: {
-          args: [3, 30],
-          msg: 'Incorrect first name',
-        },
-        is: {
-          args: /^[^1-9~`!@#$%^*()_+={}:;"<>,/?|]+$/,
-          msg: 'Incorrect first name',
-        },
-      },
+      validate: getValidationForNames('first name')
     },
     lastName: {
       type: DataTypes.STRING,
       allowNull: false,
-      len: {
-        args: [3, 30],
-        msg: 'Incorrect last name',
-      },
-      is: {
-        args: /^[^1-9~`!@#$%^*()_+={}:;"<>,/?|]+$/,
-        msg: 'Incorrect last name',
-      },
+      validate: getValidationForNames('last name'),
     },
     email: {
       type: DataTypes.STRING,
