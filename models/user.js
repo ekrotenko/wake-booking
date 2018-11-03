@@ -25,14 +25,26 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [3, 30],
+        len: {
+          args: [3, 30],
+          msg: 'Incorrect first name',
+        },
+        is: {
+          args: /^[^1-9~`!@#$%^*()_+={}:;"<>,/?|]+$/,
+          msg: 'Incorrect first name',
+        },
       },
     },
     lastName: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        len: [3, 30],
+      len: {
+        args: [3, 30],
+        msg: 'Incorrect last name',
+      },
+      is: {
+        args: /^[^1-9~`!@#$%^*()_+={}:;"<>,/?|]+$/,
+        msg: 'Incorrect last name',
       },
     },
     email: {
