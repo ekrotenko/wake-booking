@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "precommit": "npm run lint",
     "lint": "./node_modules/.bin/eslint ./*/**.js *.js",
     "lint:fix": "./node_modules/.bin/eslint ./*/**.js *.js --fix",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up",
