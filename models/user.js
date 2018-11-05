@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   function getValidationForNames(nameType) {
-    const msg = `Incorrect ${nameType}`;
+    const msg = `Invalid ${nameType}`;
     return {
       len: {
         args: [3, 30],
