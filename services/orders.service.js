@@ -6,7 +6,7 @@ class OrderService {
   }
 
   async getOrderById(id) {
-    return this.orderModel.findById(id);
+    return this.orderModel.findByPk(id);
   }
 
   async getRopewayOrdersByDate(ropewayId, date) {

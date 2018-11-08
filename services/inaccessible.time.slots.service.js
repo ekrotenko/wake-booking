@@ -11,7 +11,7 @@ class InaccessibleTimeSlotsService {
   }
 
   async getTimeSlotById(id) {
-    return this.inaccessibleTimeSlotModel.findById(id);
+    return this.inaccessibleTimeSlotModel.findByPk(id);
   }
 
   async getRopewayInaccessibleTimeSlots(ropewayId) {

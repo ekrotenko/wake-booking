@@ -20,8 +20,8 @@ describe('Users spec.', () => {
       expect(res.body.lastName).toBe(userData.lastName, 'Last name is not correct');
       expect(res.body.phone).toBe(userData.phone, 'Phone is not correct');
       expect(res.body.email).toBe(userData.email, 'Email is not correct');
-      expect(res.body.isAdmin).toBeFalsy('Is Admin is not correct');
-      expect(res.body.isOwner).toBeFalsy('Is owner entity is not correct');
+      expect(res.body.isAdmin).toBe(!!userData.isAdmin, 'Is Admin is not correct');
+      expect(res.body.isOwner).toBe(!!userData.isOwner,'Is owner entity is not correct');
       expect(res.body.createdAt).not.toBeUndefined('created at is absent');
       expect(res.body.updatedAt).not.toBeUndefined('updated at is absent');
       expect(res.body.password).toBeUndefined('password is present');

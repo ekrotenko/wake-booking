@@ -10,11 +10,10 @@ class UsersService {
   }
 
   async getUserById(id) {
-    return this.userModel.findById(id);
+    return this.userModel.findByPk(id);
   }
 
-  async updateUserData(id, body) {
-    const user = await this.getUserById(id);
+  async updateUserData(user, body) {
     return user.update(body);
   }
 

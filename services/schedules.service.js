@@ -8,7 +8,7 @@ class SchedulesService {
   }
 
   async getScheduleById(id) {
-    return this.scheduleModel.findById(id);
+    return this.scheduleModel.findByPk(id);
   }
 
   async getRopewayScheduleByDate(ropewayId, date) {
