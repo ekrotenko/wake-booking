@@ -1,10 +1,11 @@
 const crypto = require('crypto');
+const capitalize = require('lodash.capitalize');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends sequelize.Model {
     static associate(models) {
-      User.belongsToMany(models.Park, { as: 'ownedPark', through: 'parks_users', foreignKey: 'parkId' });
-      User.hasMany(models.Order, { foreignKey: 'userId' });
+      User.belongsToMany(models.Park, {as: 'ownedPark', through: 'parks_users', foreignKey: 'parkId'});
+      User.hasMany(models.Order, {foreignKey: 'userId'});
     }
 
     encryptPassword(password) {
@@ -20,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
-  function getValidationForNames(nameType) {
+  function __getValidationForNames(nameType) {
     const msg = `Invalid ${nameType}`;
     return {
       len: {
@@ -34,25 +35,47 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
+  function __getRequiredValidation(field) {
+    const msg = `${capitalize(field)} required`;
+    return {
+      notEmpty: {
+        msg,
+      }
+    }
+  }
+
   User.init({
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: getValidationForNames('first name')
+      defaultValue: '',
+      validate: Object.assign(
+        {},
+        __getRequiredValidation('first name'),
+        __getValidationForNames('first name')
+      )
     },
     lastName: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: getValidationForNames('last name'),
+      defaultValue: '',
+      validate: Object.assign(
+        {},
+        __getRequiredValidation('last name'),
+        __getValidationForNames('last name')
+      ),
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: '',
       unique: true,
-      validate: {
-        isEmail: true,
-        len: [5, 50],
-      },
+      validate: Object.assign(
+        __getRequiredValidation('email'),
+        {
+          isEmail: true,
+          len: [5, 50],
+        }),
     },
     hashedPassword: {
       type: DataTypes.STRING,
@@ -66,12 +89,16 @@ module.exports = (sequelize, DataTypes) => {
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        is: {
-          args: /^\+[1-9]\d{11,13}$/,
-          msg: 'Incorrect phone number',
-        },
-      },
+      defaultValue: '',
+      validate: Object.assign(
+        __getRequiredValidation('phone number'),
+        {
+          is: {
+            args: /^\+[1-9]\d{11,13}$/,
+            msg: 'Incorrect phone number',
+          }
+        }
+      ),
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
@@ -93,18 +120,22 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.VIRTUAL,
       allowNull: false,
+      defaultValue: '',
       set(password) {
         this.setDataValue('password', password);
       },
       get() {
         return () => this.getDataValue('password');
       },
-      validate: {
-        is: {
-          args: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$&*])(?=.*[0-9]).{8,}$/,
-          msg: 'Password must be at least 8 character length and contain one capital, special and digit character',
-        },
-      },
+      validate: Object.assign(
+        __getRequiredValidation('password'),
+        {
+          is: {
+            args: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$&*])(?=.*[0-9]).{8,}$/,
+            msg: 'Password must be at least 8 character length and contain one capital, special and digit character',
+          }
+        }
+      ),
     },
   }, {
     sequelize,
@@ -133,7 +164,7 @@ module.exports = (sequelize, DataTypes) => {
         if (user.isOwner) {
           user.isAdmin = true;
         }
-      },
+      }
     },
   });
 
