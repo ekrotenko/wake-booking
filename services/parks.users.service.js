@@ -3,12 +3,12 @@ const usersService = require('./users.service');
 
 class ParksUsersService {
   constructor(parksService, usersService) {
-    this.usersService = usersService;
+    this.__usersService = usersService;
   }
 
 
   async addParkOwner(park, userId) {
-    const user = await this.usersService.getUserById(userId);
+    const user = await this.__usersService.getUserById(userId);
     if (!user || !user.isOwner) {
       const error = new Error('User is not valid. Impossible to assign to park');
       error.status = 422;
@@ -20,13 +20,13 @@ class ParksUsersService {
   }
 
   async addParkAdmin(park, userId) {
-    const user = await this.usersService.getUserById(userId);
+    const user = await this.__usersService.getUserById(userId);
     if (!user) {
       const error = new Error('Not found');
       error.code = 401;
       return error;
     }
-    await this.usersService.updateUserData(userId, { isAdmin: true });
+    await this.__usersService.updateUserData(userId, { isAdmin: true });
     await park.addAdmin(userId);
 
     return park;
@@ -51,6 +51,10 @@ class ParksUsersService {
     await park.reload();
 
     return park;
+  }
+
+  async createPark(user, park){
+    return user.createOwnedPark(park);
   }
 }
 

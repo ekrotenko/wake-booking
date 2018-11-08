@@ -10,7 +10,7 @@ class ParksService {
   }
 
   async getParkById(id) {
-    return this.parkModel.findById(id);
+    return this.parkModel.findByPk(id);
   }
 
   async updateParkData(id, body) {

@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     zipCode: {
       type: DataTypes.STRING,
       validate: {
-        len: [5, 9],
+        len: [5, 10],
       },
     },
     address: {

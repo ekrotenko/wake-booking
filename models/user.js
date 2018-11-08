@@ -129,7 +129,7 @@ module.exports = (sequelize, DataTypes) => {
           user.hashedPassword = user.encryptPassword(user.password());
         }
       },
-      afterValidate: (user) => {
+      beforeSave(user) {
         if (user.isOwner) {
           user.isAdmin = true;
         }

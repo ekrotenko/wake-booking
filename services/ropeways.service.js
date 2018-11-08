@@ -6,7 +6,7 @@ class RopewaysService {
   }
 
   async getRopewayById(ropewayId) {
-    return this.ropewaysModel.findById(ropewayId, {
+    return this.ropewaysModel.findByPk(ropewayId, {
       include: [{ all: true }],
     });
   }
