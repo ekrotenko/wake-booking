@@ -41,7 +41,7 @@ module.exports = {
     length: (field) => {
       return `Invalid ${field}`
     },
-    uniqueEmail: 'email must be unique'
+    uniqueEmail: 'Email must be unique'
   },
 
 };

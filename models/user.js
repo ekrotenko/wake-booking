@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const capitalize = require('lodash.capitalize');
+const validation = require('./model.validations/user');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends sequelize.Model {
@@ -21,84 +21,34 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
-  function __getValidationForNames(nameType) {
-    const msg = `Invalid ${nameType}`;
-    return {
-      len: {
-        args: [3, 30],
-        msg,
-      },
-      is: {
-        args: /^[^1-9~`!@#$%^*()_+={}:;"<>,/?|]+$/,
-        msg,
-      },
-    }
-  }
-
-  function __getRequiredValidation(field) {
-    const msg = `${capitalize(field)} required`;
-    return {
-      notEmpty: {
-        msg,
-      }
-    }
-  }
-
   User.init({
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: '',
-      validate: Object.assign(
-        {},
-        __getRequiredValidation('first name'),
-        __getValidationForNames('first name')
-      )
+      validate: validation.names('first name')
     },
     lastName: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: '',
-      validate: Object.assign(
-        {},
-        __getRequiredValidation('last name'),
-        __getValidationForNames('last name')
-      ),
+      validate: validation.names('last name')
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: '',
-      unique: true,
-      validate: Object.assign(
-        __getRequiredValidation('email'),
-        {
-          isEmail: true,
-          len: [5, 50],
-        }),
-    },
-    hashedPassword: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      // Making `.hashedPassword` act like a function hides it when serializing to JSON.
-      // This is a hack to get around Sequelize's lack of a "private" option.
-      get() {
-        return () => this.getDataValue('hashedPassword');
+      unique: {
+        args: true,
+        msg: 'Email must be unique'
       },
+      validate: validation.email()
     },
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: '',
-      validate: Object.assign(
-        __getRequiredValidation('phone number'),
-        {
-          is: {
-            args: /^\+[1-9]\d{11,13}$/,
-            msg: 'Incorrect phone number',
-          }
-        }
-      ),
+      validate: validation.phone()
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
@@ -117,6 +67,15 @@ module.exports = (sequelize, DataTypes) => {
         return () => this.getDataValue('salt');
       },
     },
+    hashedPassword: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      // Making `.hashedPassword` act like a function hides it when serializing to JSON.
+      // This is a hack to get around Sequelize's lack of a "private" option.
+      get() {
+        return () => this.getDataValue('hashedPassword');
+      },
+    },
     password: {
       type: DataTypes.VIRTUAL,
       allowNull: false,
@@ -127,15 +86,7 @@ module.exports = (sequelize, DataTypes) => {
       get() {
         return () => this.getDataValue('password');
       },
-      validate: Object.assign(
-        __getRequiredValidation('password'),
-        {
-          is: {
-            args: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$&*])(?=.*[0-9]).{8,}$/,
-            msg: 'Password must be at least 8 character length and contain one capital, special and digit character',
-          }
-        }
-      ),
+      validate: validation.password()
     },
   }, {
     sequelize,
