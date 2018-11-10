@@ -21,14 +21,15 @@ describe('Parks spec.', () => {
         .send(newUser))
         .body.id;
 
-      const {res, body: {user, park}} = await request(app)
+      const res = await request(app)
         .post(usersParksUrl(userId))
         .send(newPark);
+      const {body: {user, park}} = res;
 
       const {body: userRes} = await request(app)
         .get(`${usersUrl}/${userId}`);
 
-      expect(res.statusCode).toBe(201, `Status code is not correct. ${park.body}`);
+      expect(res.statusCode).toBe(201, `Status code is not correct. ${res.body}`);
       expect(user.id).toBe(userId, `User id is incorrect`);
 
       using(newPark, (value, field) => {

@@ -10,7 +10,7 @@ class UserValidations {
         msg,
       },
       is: {
-        args: /^[^1-9~`!@#$%^*()_+={}:;"<>,/?|]+$/,
+        args: /^[^1-9~`!@#$%^*()_+={}:;"<>,.&/?|]+$/,
         msg,
       },
     };
@@ -19,11 +19,18 @@ class UserValidations {
   }
 
   static email() {
+    const msg = 'Invalid email';
     return Object.assign({},
       __getRequiredValidation('email'),
       {
-        isEmail: true,
-        len: [5, 50],
+        isEmail: {
+          args: true,
+          msg
+        },
+        len: {
+          args: [5, 50],
+          msg
+        },
       });
   }
 
@@ -46,9 +53,9 @@ class UserValidations {
       __getRequiredValidation(fieldName),
       {
         is: {
-          args: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$&*])(?=.*[0-9]).{8,}$/,
+          args: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[`~!@#$%^&*()_+={}:;"'<>,.])(?=.*[0-9]).{8,30}$/,
           msg: `Invalid ${fieldName} strength`,
-        }
+        },
       }
     );
   }
