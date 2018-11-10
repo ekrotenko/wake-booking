@@ -1,5 +1,5 @@
 const appConfig = {
-  development: {
+  test: {
     port: 3000,
     security: {
       jwt: {
@@ -10,7 +10,7 @@ const appConfig = {
       },
     },
   },
-  local: {
+  development: {
     port: 3000,
     security: {
       jwt: {

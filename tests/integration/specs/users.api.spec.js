@@ -21,7 +21,7 @@ describe('Users spec.', () => {
       expect(res.body.phone).toBe(userData.phone, 'Phone is not correct');
       expect(res.body.email).toBe(userData.email, 'Email is not correct');
       expect(res.body.isAdmin).toBe(!!userData.isAdmin, 'Is Admin is not correct');
-      expect(res.body.isOwner).toBe(!!userData.isOwner,'Is owner entity is not correct');
+      expect(res.body.isOwner).toBe(!!userData.isOwner, 'Is owner entity is not correct');
       expect(res.body.createdAt).not.toBeUndefined('created at is absent');
       expect(res.body.updatedAt).not.toBeUndefined('updated at is absent');
       expect(res.body.password).toBeUndefined('password is present');
@@ -29,7 +29,7 @@ describe('Users spec.', () => {
       expect(res.body.hashedPassword).toBeUndefined('hashed password is present');
     });
 
-    describe('Dependent tests', () => {
+    describe('Dependent tests.', () => {
       let id;
       let userData;
 
@@ -93,60 +93,102 @@ describe('Users spec.', () => {
     });
 
     describe('Fields validation.', () => {
-      it('Required fields', async () => {
-        const res = await request(app)
-          .post(url)
-          .send({});
+      describe('Required fields', () => {
+        it('Not passed fields', async () => {
+          const requiredMessages = Object.assign({}, data.validationMessages.required);
+          const res = await request(app)
+            .post(url)
+            .send({});
 
-        expect(res.statusCode).toBe(422, 'Status code is not correct');
+          expect(res.statusCode).toBe(422, 'Status code is not correct');
 
-        using(data.validationMessages.required, (expectedMessage, field) => {
-          const error = res.body.errors.find(e => e.path === field);
-          expect(error.message).toBe(expectedMessage, `Required validation message of ${field} is not correct`);
+          using(requiredMessages, (expectedMessage, field) => {
+            const error = res.body.errors.find(e => e.path === field);
+            expect(error.message).toBe(expectedMessage, `Required validation message of ${field} is not correct`);
+          });
         });
+
+        using(data.validation.emptyValue.values, (field) => {
+          it(`Empty value in ${field}`, async () => {
+            const payload = data.newUser();
+            payload[field] = '';
+
+            const res = await request(app)
+              .post(url)
+              .send(payload);
+
+            const expectedMessage = data.validationMessages.required[field];
+            expect(res.statusCode).toBe(422, 'Status code is not correct');
+            expect(res.body.errors[0].message)
+              .toBe(expectedMessage, `Required validation message of ${field} is not correct`);
+          })
+        })
+
       });
 
-      using(data.lengthValidation, (validationData, description) => {
-        describe(`${description} length validation`, () => {
+
+      using(data.validation.length, (validationData, field) => {
+        describe(`${field} length validation.`, () => {
 
           using(validationData.values, (length) => {
             it(`Length ${length}`, async () => {
-              const payload = Object.assign({}, data.newUser());
-              payload[description] = randomString({length});
+              const payload = data.newUser();
+              payload[field] = data.generateLengthData(field, length);
 
               const res = await request(app)
                 .post(url)
                 .send(payload);
 
               expect(res.statusCode).toBe(422);
-              expect(res.body.errors[0].message).toBe(data.validationMessages.length(validationData.nameInError));
+              expect(res.body.errors[0].message)
+                .toBe(data.validationMessages.invalid(validationData.nameInError || field),
+                  `${field} validation error is incorrect`);
             });
           })
 
         });
       });
 
-      describe('Email field', ()=>{
+      using(data.validation.content, (validationData, field) => {
+        describe(`${field} content validation`, () => {
 
-        let existingEmail;
+          using(validationData.values, (content) => {
+            it(`Length ${content}`, async () => {
+              const payload = data.newUser();
+              payload[field] = content;
 
-        beforeEach(async ()=>{
-          existingEmail = (await request(app)
+              const res = await request(app)
+                .post(url)
+                .send(payload);
+
+              expect(res.statusCode).toBe(422);
+              expect(res.body.errors[0].message)
+                .toBe(data.validationMessages.invalid(validationData.nameInError || field),
+                  `${field} validation error is incorrect`);
+            });
+          })
+
+        });
+      });
+
+      describe('Email field', () => {
+        it('Unique', async () => {
+          const existingEmail = (await request(app)
             .post(url)
             .send(data.newUser()))
             .body.email;
-        });
 
-        it('Unique', async ()=>{
           const payload = data.newUser();
           payload.email = existingEmail;
+
           const res = await request(app)
             .post(url)
             .send(payload);
 
           expect(res.statusCode).toBe(422);
-          expect(res.body.errors[0].message).toBe(data.validationMessages.uniqueEmail, `Validation message of unique email is incorrect`);
-        })
+          expect(res.body.errors[0].message)
+            .toBe(data.validationMessages.uniqueEmail, `Validation message of unique email is incorrect`);
+        });
       })
     })
   });
