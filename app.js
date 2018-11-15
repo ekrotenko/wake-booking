@@ -32,7 +32,6 @@ app.use(auth.initialize());
 app.use('/auth', authRoute);
 app.use('/parks', parksRouter);
 app.use('/users', usersRouter);
-app.use('/ropeways', ropewaysRouter);
 app.use('/orders', ordersRouter);
 app.use('/schedules', schedules);
 app.use('/inaccessible_slots', inaccessibleSlots);

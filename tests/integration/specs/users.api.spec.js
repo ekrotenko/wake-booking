@@ -1,8 +1,7 @@
 const request = require('supertest');
 const app = require('../../../app');
-const data = require('../data/user/users.data');
+const data = require('../data/user');
 const using = require('jasmine-data-provider');
-const randomString = require('random-string');
 
 const url = '/users';
 

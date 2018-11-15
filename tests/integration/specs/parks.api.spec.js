@@ -2,7 +2,7 @@ const using = require('jasmine-data-provider');
 const request = require('supertest');
 const app = require('../../../app');
 
-const userData = require('../data/user/users.data');
+const userData = require('../data/user/index');
 const parksData = require('../data/parks');
 
 const usersUrl = '/users';

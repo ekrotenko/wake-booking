@@ -3,12 +3,13 @@ const parksRopewaysService = require('../services/parks.ropeways.service');
 
 class RopewaysController {
   constructor(ropewayService, parksRopewaysService) {
-    this.ropewayService = ropewayService;
-    this.parksRopewaysService = parksRopewaysService;
+    this.__ropewayService = ropewayService;
+    this.__parksRopewaysService = parksRopewaysService;
   }
 
   async setRopewayParam(req, res, next) {
-    const ropeway = await this.ropewayService.getRopewayById(req.params.id);
+    const ropeway = await this.__ropewayService
+      .getRopewayById(req.params.id);
     if (!ropeway) {
       res.status(404).send('Ropeway not found');
     } else {
@@ -21,22 +22,26 @@ class RopewaysController {
     await res.send(req.ropeway);
   }
 
-  async getAllRopeways(req, res) {
-    await res.send(await this.ropewayService.getAllRopeways());
+  async getParkRopeways(req, res) {
+    await res.send(await this.__parksRopewaysService
+      .getParkRopeways(req.park));
   }
 
   async addParkRopeway(req, res, next) {
-    res.send(await this.parksRopewaysService.addParkRopeway(req.body)
+    res.status(201).send(await this.__parksRopewaysService
+      .createRopewayInPark(req.park, req.body)
       .catch(next));
   }
 
-  async updateRopeway(req, res, next) {
-    res.send(await this.ropewayService.updateRopeway(req.ropeway, req.body)
+  async updateParkRopeway(req, res, next) {
+    res.send(await this.__ropewayService
+      .updateRopeway(req.ropeway, req.body)
       .catch(next));
   }
 
-  async deleteRopeway(req, res, next) {
-    res.send(await this.ropewayService.deleteRopeway(req.ropeway)
+  async deleteParkRopeway(req, res, next) {
+    res.send(await this.__ropewayService
+      .deleteRopeway(req.ropeway)
       .catch(next));
   }
 }
