@@ -1,10 +1,32 @@
 const usersService = require('../services/users.service');
 const parksUsersService = require('../services/parks.users.service');
+const Joi = require('joi');
+const payloadValidationHelper = require('../libs/helpers/payload-validation-helper');
 
 class UsersController {
   constructor(usersService, parksUsersService) {
     this.__usersService = usersService;
     this.__parksUsersService = parksUsersService;
+
+    this.__joi_post_validator = Joi
+      .object({
+        firstName: Joi.string()
+          .min(3)
+          .max(30)
+          .regex(/^[^1-9~`!@#$%^*()_+={}:;"<>,.&/?|]+$/)
+          .required(),
+        ip_masks: Joi.array().min(1)
+          .items(
+            Joi.string().ip({
+              version: [
+                'ipv4',
+                'ipv6',
+              ],
+              cidr: 'optional',
+            })
+          ),
+      })
+      .min(1);
   }
 
   async getAll(req, res) {
@@ -32,7 +54,9 @@ class UsersController {
   }
 
   async createUser(req, res, next) {
+
     try {
+      payloadValidationHelper.joiValidate(req.body, this.__joi_post_validator);
       const user = await this.__usersService.createUser(req.body);
       res.status(201).send(user);
     } catch (error) {

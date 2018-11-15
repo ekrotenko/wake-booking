@@ -1,5 +1,8 @@
 require('express-promise');
 
+const mapSequelizeErrors = require('./error.handler');
+const renderPayloadValidationError = require('./libs/helpers/payload-validation-helper');
+
 const express = require('express');
 const volleyball = require('volleyball');
 const bodyParser = require('body-parser');
@@ -40,12 +43,11 @@ app.use('/inaccessible_slots', inaccessibleSlots);
 app.use('*', (req, res) => {
   res.send('This is default route');
 });
+app.use(renderPayloadValidationError.middleware);
 app.use((err, req, res, next) => {
-  if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
-    err.status = 422;
-  }
+  const error = mapSequelizeErrors(err);
 
-  res.status(err.status || 500).send(err);
+  res.status(error.status || 500).send(error.errors);
   next();
 });
 
