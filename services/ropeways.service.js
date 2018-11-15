@@ -1,4 +1,4 @@
-const { Ropeway } = require('../models');
+const {Ropeway} = require('../models');
 
 class RopewaysService {
   constructor(ropewaysModel) {
@@ -7,12 +7,8 @@ class RopewaysService {
 
   async getRopewayById(ropewayId) {
     return this.ropewaysModel.findByPk(ropewayId, {
-      include: [{ all: true }],
+      // include: [{ all: true }],
     });
-  }
-
-  async getAllRopeways() {
-    return this.ropewaysModel.findAll();
   }
 
   async updateRopeway(ropeway, body) {

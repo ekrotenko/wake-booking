@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const ropewaysRouter = require('./ropeways.router');
 const parksController = require('../controllers/parks.controller');
 
 router.param('id', parksController.setParkParam.bind(parksController));
@@ -11,5 +12,6 @@ router.put('/:id/owner/:userId', parksController.addOwner.bind(parksController))
 router.delete('/:id', parksController.deletePark.bind(parksController));
 router.delete('/:id/admin/:userId', parksController.removeAdmin.bind(parksController));
 
-module.exports = router;
+router.use('/:id/ropeways', ropewaysRouter);
 
+module.exports = router;
