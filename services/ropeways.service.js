@@ -2,7 +2,7 @@ const { Ropeway } = require('../models');
 
 class RopewaysService {
   constructor(ropewaysModel) {
-    this.ropewaysModel = ropewaysModel;
+    // this.ropewaysModel = ropewaysModel;
   }
 
   async getRopewayById(ropewayId) {
