@@ -1,6 +1,11 @@
 const { Schedule } = require('../models');
 const ropewaysService = require('./ropeways.service');
 
+const Moment = require('moment');
+const MomentRange = require('moment-range');
+
+const moment = MomentRange.extendMoment(Moment);
+
 class SchedulesService {
   constructor(scheduleModel, ropewayService) {
     this.scheduleModel = scheduleModel;
@@ -26,25 +31,31 @@ class SchedulesService {
     return ropewaySchedule;
   }
 
-  async addRopewaySchedule(body) {
-    const ropeway = await this.ropewaysService.getRopewayById(body.ropewayId);
-    if (!ropeway) {
-      const error = new Error('Ropeway not found');
-      error.status = 404;
-      throw error;
+  async __isScheduleIntersected(ropeway, scheduleData) {
+    const schedules = await this.getRopewaysSchedules(ropeway);
+
+    if (schedules.length) {
+      const newScheduleRange = moment.range(moment(scheduleData.dateFrom), moment(scheduleData.dateTo));
+      const intersections = schedules.filter((sc) => {
+        const existingScheduleRange = moment.range(moment(sc.dateFrom), moment(sc.dateTo));
+
+        return newScheduleRange.intersect(existingScheduleRange);
+      });
+
+      return intersections.length > 0;
     }
 
-    return ropeway.createSchedule(body);
+    return false;
   }
 
-  async getRopewaysSchedules(ropewayId) {
-    const ropeway = await this.ropewaysService.getRopewayById(ropewayId);
-    if (!ropeway) {
-      const error = new Error('Ropeway not found');
-      error.status = 404;
-      throw error;
+  async addRopewaySchedule(ropeway, scheduleData) {
+    if (await this.__isScheduleIntersected(ropeway, scheduleData)) {
+      throw new Error('Schedule dates conflict');
     }
+    return ropeway.createSchedule(scheduleData);
+  }
 
+  async getRopewaysSchedules(ropeway) {
     return ropeway.getSchedules();
   }
 }

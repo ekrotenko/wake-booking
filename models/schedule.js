@@ -1,6 +1,3 @@
-const moment = require('moment');
-// TODO: add order add/cancel time options
-
 module.exports = (sequelize, DataTypes) => {
   class Schedule extends sequelize.Model {
   }
@@ -51,12 +48,14 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     weekMask: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 127,
+      defaultValue: '1111111',
       validate: {
-        min: 0,
-        max: 127,
+        is: {
+          args: /^[0,1]{7}/,
+          msg: 'Invalid week mask',
+        },
       },
     },
   }, {
@@ -78,23 +77,6 @@ module.exports = (sequelize, DataTypes) => {
             dateTo: { [sequelize.Op.gte]: new Date(date) },
           },
         };
-      },
-    },
-    validate: {
-      isIntersected() {
-        return Schedule.findAll({
-          where: { ropewayId: { [sequelize.Op.eq]: this.ropewayId } },
-        })
-          .then((schedules) => {
-            if (schedules.length) {
-              // FIXME: fix add schedule after some one
-              const intersections = schedules.filter(sc => moment(sc.dateFrom).isSameOrBefore(moment(this.dateFrom)) ||
-                                    moment(sc.dateTo).isSameOrAfter(moment(this.dateTo)));
-              if (intersections.length) {
-                throw new Error('Schedule dates conflict');
-              }
-            }
-          });
       },
     },
   });

@@ -22,14 +22,17 @@ class SchedulesController {
   }
 
   async addScheduleForRopeway(req, res, next) {
-    res.send(await this.schedulesService
-      .addRopewaySchedule(req.body)
-      .catch(next));
+    try {
+      res.status(201).send(await this.schedulesService
+        .addRopewaySchedule(req.ropeway, req.body));
+    } catch (error) {
+      next(error);
+    }
   }
 
   async getRopewaySchedules(req, res, next) {
     res.send(await this.schedulesService
-      .getRopewaysSchedules(req.params.ropewayId)
+      .getRopewaysSchedules(req.ropeway)
       .catch(next));
   }
 }
