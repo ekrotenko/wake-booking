@@ -10,7 +10,6 @@ const auth = require('./libs/auth')();
 // Routers:
 const parksRouter = require('./routes/parks.router');
 const usersRouter = require('./routes/users.router');
-const ropewaysRouter = require('./routes/ropeways.router');
 const ordersRouter = require('./routes/orders.router');
 const schedules = require('./routes/schedules.router');
 const inaccessibleSlots = require('./routes/inaccessible.time.slots.router');

@@ -4,8 +4,8 @@ const validation = require('./model.validations/user');
 module.exports = (sequelize, DataTypes) => {
   class User extends sequelize.Model {
     static associate(models) {
-      User.belongsToMany(models.Park, {as: 'ownedPark', through: 'parks_users', foreignKey: 'parkId'});
-      User.hasMany(models.Order, {foreignKey: 'userId'});
+      User.belongsToMany(models.Park, { as: 'ownedPark', through: 'parks_users', foreignKey: 'parkId' });
+      User.hasMany(models.Order, { foreignKey: 'userId' });
     }
 
     encryptPassword(password) {
@@ -26,13 +26,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: '',
-      validate: validation.names('first name')
+      validate: validation.names('first name'),
     },
     lastName: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: '',
-      validate: validation.names('last name')
+      validate: validation.names('last name'),
     },
     email: {
       type: DataTypes.STRING,
@@ -40,15 +40,15 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: '',
       unique: {
         args: true,
-        msg: 'Email must be unique'
+        msg: 'Email must be unique',
       },
-      validate: validation.email()
+      validate: validation.email(),
     },
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: '',
-      validate: validation.phone()
+      validate: validation.phone(),
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
@@ -86,7 +86,7 @@ module.exports = (sequelize, DataTypes) => {
       get() {
         return () => this.getDataValue('password');
       },
-      validate: validation.password()
+      validate: validation.password(),
     },
   }, {
     sequelize,
@@ -115,7 +115,7 @@ module.exports = (sequelize, DataTypes) => {
         if (user.isOwner) {
           user.isAdmin = true;
         }
-      }
+      },
     },
   });
 

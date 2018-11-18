@@ -65,7 +65,7 @@ class ParksController {
 
   async createRopeway(req, res, next) {
     try {
-      const {park} = req;
+      const { park } = req;
       const ropeway = await this.__parksRopewaysService
         .createRopewayInPark(park, req.body);
 
@@ -79,5 +79,5 @@ class ParksController {
 module.exports = new ParksController(
   parksService,
   parksUsersService,
-  parkRopewaysService
+  parkRopewaysService,
 );

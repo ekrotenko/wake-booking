@@ -53,7 +53,7 @@ class ParksUsersService {
     return park;
   }
 
-  async createPark(user, park){
+  async createPark(user, park) {
     return user.createOwnedPark(park);
   }
 }

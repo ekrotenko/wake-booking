@@ -42,16 +42,16 @@ class UsersController {
 
   async createParkForUser(req, res, next) {
     try {
-      let user = req.user;
-      if(!user.isOwner){
-        user = await this.__usersService.updateUserData(req.user, {isOwner: true});
+      let { user } = req;
+      if (!user.isOwner) {
+        user = await this.__usersService.updateUserData(req.user, { isOwner: true });
       }
       const park = await this.__parksUsersService.createPark(user, req.body);
       const responseData = {
         user: {
-          id: req.user.id
+          id: req.user.id,
         },
-        park
+        park,
       };
 
       res.status(201).send(responseData);

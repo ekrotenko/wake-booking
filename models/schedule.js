@@ -3,9 +3,6 @@ const moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
   class Schedule extends sequelize.Model {
-    // static associate(models) {
-    //     Schedule.belongsTo(models.Ropeway, {foreignKey: 'scheduleId'});
-    // }
   }
 
   Schedule.init({
