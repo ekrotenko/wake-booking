@@ -8,7 +8,7 @@ const {newScheduleWithDefaultValues, newSchedule, defaultValues} = require('../d
 async function preparePrecondition() {
   let userId;
   let parkId;
-  let ropewayid;
+  let ropewayId;
 
   userId = (await request(app)
     .post('/users')
