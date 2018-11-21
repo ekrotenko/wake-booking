@@ -1,8 +1,9 @@
 const request = require('supertest');
 const app = require('../../../app');
+const {formatTimestamp} = require('../helpers');
 const {newPark} = require('../data/parks');
 const {newUser} = require('../data/user');
-const {newRopeway, formatTimestamp} = require('../data/ropeway');
+const {newRopeway} = require('../data/ropeway');
 
 describe('Ropeways spec.', () => {
   let parkId;
@@ -24,14 +25,14 @@ describe('Ropeways spec.', () => {
         .post(`/parks/${parkId}/ropeways`)
         .send(ropewayData);
 
-      createdRopeway = res.body;
+      const createdRopeway = res.body;
 
       expect(res.statusCode).toBe(201, `Status code is not correct.`);
-      expect(res.body.name).toBe(ropewayData.name, 'Name is incorrect');
-      expect(res.body.description).toBe(ropewayData.description, 'Description is not correct');
-      expect(res.body.createdAt).not.toBeUndefined('created at is absent');
-      expect(res.body.updatedAt).not.toBeUndefined('updated at is absent');
-      expect(res.body.deletedAt).toBeUndefined('deleted at is present');
+      expect(createdRopeway.name).toBe(ropewayData.name, 'Name is incorrect');
+      expect(createdRopeway.description).toBe(ropewayData.description, 'Description is not correct');
+      expect(createdRopeway.createdAt).not.toBeUndefined('created at is absent');
+      expect(createdRopeway.updatedAt).not.toBeUndefined('updated at is absent');
+      expect(createdRopeway.deletedAt).toBeUndefined('deleted at is present');
     });
 
     it('should get park ropeways', async () => {

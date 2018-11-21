@@ -31,7 +31,7 @@ class SchedulesService {
     return ropewaySchedule;
   }
 
-  async __isScheduleIntersected(ropeway, scheduleData) {
+  async isScheduleIntersected(ropeway, scheduleData) {
     const schedules = await this.getRopewaysSchedules(ropeway);
 
     if (schedules.length) {
@@ -49,9 +49,6 @@ class SchedulesService {
   }
 
   async addRopewaySchedule(ropeway, scheduleData) {
-    if (await this.__isScheduleIntersected(ropeway, scheduleData)) {
-      throw new Error('Schedule dates conflict');
-    }
     return ropeway.createSchedule(scheduleData);
   }
 

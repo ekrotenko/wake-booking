@@ -8,7 +8,4 @@ module.exports = {
       description: faker.lorem.paragraph(),
     }
   },
-  formatTimestamp(timestamp){
-    return timestamp.split('.')[0];
-  }
 };
