@@ -37,16 +37,16 @@ function randomDuration() {
 
 function generateNotIntersectedDates(amount) {
   let dates = [];
-  let initialMonths = 10;
+  let startDate = moment().subtract(10, 'months');
+
   while (amount > 0) {
-    const startMonth = initialMonths-2;
-    const endMonth = initialMonths;
+    const endDate = moment(startDate).add(2, 'months');
     dates.push({
-      dateFrom: moment().add(startMonth, 'months').format(dateFormat),
-      dateTo: moment().subtract(endMonth, 'months').subtract(1, 'day').format(dateFormat),
+      dateFrom: moment(startDate).format(dateFormat),
+      dateTo: moment(endDate).subtract(1, 'day').format(dateFormat),
     });
 
-    initialMonths = endMonth;
+    startDate = moment(endDate);
     amount--;
   }
 
@@ -69,11 +69,21 @@ module.exports = {
       timeTo: '21:00',
     }
   ),
-  newSchedule() {
+  newScheduleData() {
     return Object.assign(notIntersectedDates.pop(),
       {
         timeFrom: '8:00',
         timeTo: '21:00',
+        duration: randomDuration(),
+        interval: randomDuration(),
+        weekMask: randomWeekMask()
+      })
+  },
+  updateScheduleData() {
+    return Object.assign(notIntersectedDates.pop(),
+      {
+        timeFrom: '9:00',
+        timeTo: '23:00',
         duration: randomDuration(),
         interval: randomDuration(),
         weekMask: randomWeekMask()

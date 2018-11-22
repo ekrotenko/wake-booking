@@ -35,6 +35,12 @@ class SchedulesController {
     }
   }
 
+  async updateSchedule(req, res, next) {
+    res.send(await this.schedulesService
+      .updateRopewaysSchedule(req.schedule, req.body)
+      .catch(next));
+  }
+
   async getRopewaySchedules(req, res, next) {
     res.send(await this.schedulesService
       .getRopewaysSchedules(req.ropeway)
