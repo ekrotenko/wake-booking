@@ -18,10 +18,26 @@ function randomWeekMask() {
 }
 
 function randomDuration() {
-  const duration = faker.random.number({min: 5, max: 60});
-  const value = (duration - duration % 5);
+  const availableDurations = [30, 60, 90, 120];
+  const randomIndex = faker.random.number({min: 0, max: availableDurations.length - 1});
 
-  return value
+  return availableDurations[randomIndex];
+}
+
+function randomInterval(duration = 120) {
+  const availableIntervals = [5, 10, 15, 30, 60, 90, 120];
+  const filteredIntervals = availableIntervals.filter(interval => interval <= duration);
+
+  const randomIndex = faker.random.number({min: 0, max: filteredIntervals.length - 1});
+
+  return filteredIntervals[randomIndex]
+}
+
+function getValidDurationAndInterval() {
+  const duration = randomDuration();
+  const interval = randomInterval(duration);
+
+  return {duration, interval};
 }
 
 function generateNotIntersectedDates(amount) {
@@ -59,24 +75,25 @@ module.exports = {
     }
   ),
   newScheduleData() {
-    return Object.assign(notIntersectedDates.pop(),
+    return Object.assign(
+      notIntersectedDates.pop(),
       {
         timeFrom: '8:00',
         timeTo: '21:00',
-        duration: randomDuration(),
-        interval: randomDuration(),
         weekMask: randomWeekMask()
-      })
+      },
+      getValidDurationAndInterval()
+    );
   },
   updateScheduleData() {
     return Object.assign(notIntersectedDates.pop(),
       {
         timeFrom: '9:00',
         timeTo: '23:00',
-        duration: randomDuration(),
-        interval: randomDuration(),
         weekMask: randomWeekMask()
-      })
+      },
+      getValidDurationAndInterval()
+    )
   },
 
 };

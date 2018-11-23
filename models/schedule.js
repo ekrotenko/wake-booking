@@ -23,27 +23,20 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 60,
-      validation: {
-        min: 10,
-        max: 60,
-        multiple() {
-          if (this.duration % 5) {
-            throw new Error('Should be multiple of 5 minutes');
-          }
+      validate: {
+        isIn: {
+          args: [[30, 60, 90, 120]],
+          msg: 'Invalid duration',
         },
       },
     },
     interval: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 30,
-      validation: {
-        min: 1,
-        max: 60,
-        multiple() {
-          if (this.duration % 5) {
-            throw new Error('Should be multiple of 5 minutes');
-          }
+      validate: {
+        isIn: {
+          args: [[5, 10, 15, 30, 60, 90, 120]],
+          msg: 'Invalid interval',
         },
       },
     },
@@ -62,6 +55,21 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     tableName: 'schedules',
     paranoid: true,
+    hooks: {
+      beforeValidate(schedule) {
+        if (!schedule.interval) {
+          schedule.interval = schedule.duration;
+        }
+      },
+    },
+    validate: {
+      intervalShouldBeLessThanOrEqualDuration() {
+        if (this.interval > this.duration) {
+          throw new Error('Invalid interval');
+        }
+      },
+    },
+
     scopes: {
       belongsToRopeway(ropewayId) {
         return {

@@ -36,7 +36,7 @@ describe('Schedule spec.', () => {
       expect(createdSchedule.timeFrom).toBe(scheduleData.timeFrom, 'Time from is not correct');
       expect(createdSchedule.timeTo).toBe(scheduleData.timeTo, 'Time to is not correct');
       expect(createdSchedule.duration).toBe(defaultValues.duration, 'Duration is not correct');
-      expect(createdSchedule.interval).toBe(defaultValues.interval, 'Interval is not correct');
+      expect(createdSchedule.interval).toBe(createdSchedule.duration, 'Interval is not correct');
       expect(createdSchedule.weekMask).toBe(defaultValues.weekMask, 'Interval is not correct');
       expect(createdSchedule.createdAt).not.toBeUndefined('created at is absent');
       expect(createdSchedule.updatedAt).not.toBeUndefined('updated at is absent');
@@ -82,7 +82,7 @@ describe('Schedule spec.', () => {
 
       expect(res.statusCode).toBe(200, `Status code is not correct.`);
       expect(res.body.length).toBeGreaterThan(0, 'Count of ropeways is incorrect');
-      expect(isPresentInResponse).toBe(true,'Created schedule is not present in response');
+      expect(isPresentInResponse).toBe(true, 'Created schedule is not present in response');
     });
 
     it(`should get ropeway's specific schedule`, async () => {
@@ -171,6 +171,10 @@ describe('Schedule spec.', () => {
       expect(res.statusCode).toBe(404, 'Status code is not correct');
     });
   });
+
+  describe('Negative flow.', () => {
+
+  })
 });
 
 

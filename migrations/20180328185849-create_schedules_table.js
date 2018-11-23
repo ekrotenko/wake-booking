@@ -38,7 +38,6 @@ module.exports = {
       interval: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 30,
       },
       weekMask: {
         type: Sequelize.STRING,
