@@ -46,6 +46,12 @@ class SchedulesController {
       .getRopewaysSchedules(req.ropeway)
       .catch(next));
   }
+
+  async deleteSchedule(req, res, next) {
+    res.send(await this.schedulesService
+      .deleteRopewaySchedule(req.schedule, req.body)
+      .catch(next));
+  }
 }
 
 module.exports = new SchedulesController(scheduleService);

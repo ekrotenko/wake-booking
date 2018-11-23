@@ -102,7 +102,7 @@ class TimeSlotsService {
 
   _getWeeklySchedule(schedule) {
     const parseResult = {};
-    this._maskToArray(schedule.weekMask).forEach((day, index) => {
+    schedule.weekMask.split('').forEach((day, index) => {
       const weekDay = moment.weekdays(index).toLowerCase();
 
       if (day > 0) {

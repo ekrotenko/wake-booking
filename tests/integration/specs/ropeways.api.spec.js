@@ -8,7 +8,7 @@ const {newRopeway} = require('../data/ropeway');
 describe('Ropeways spec.', () => {
   let parkId;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const {id: userId} = (await request(app)
       .post('/users')
       .send(newUser())).body;
@@ -43,17 +43,12 @@ describe('Ropeways spec.', () => {
 
       const res = await request(app)
         .get(`/parks/${parkId}/ropeways`);
-      const returnedRopeway = res.body[0];
+
+      const isCreatedRopewayPresent = res.body.some(ropeway=> ropeway.id===createdRopeway.id);
 
       expect(res.statusCode).toBe(200, `Status code is not correct.`);
-      expect(res.body.length).toBe(1, 'Count of ropeways is incorrect');
-      expect(returnedRopeway.name).toBe(createdRopeway.name, 'Name is incorrect');
-      expect(returnedRopeway.description).toBe(createdRopeway.description, 'Description is not correct');
-      expect(formatTimestamp(returnedRopeway.createdAt))
-        .toBe(formatTimestamp(createdRopeway.createdAt), 'created at is incorrect');
-      expect(formatTimestamp(returnedRopeway.updatedAt))
-        .toBe(formatTimestamp(createdRopeway.updatedAt), 'updated at is incorrect');
-      expect(returnedRopeway.deletedAt).toBe(null, 'deleted at is not null');
+      expect(res.body.length).toBeGreaterThan(0, 'Count of ropeways is incorrect');
+      expect(isCreatedRopewayPresent).toBe(true, 'Created ropeway is not present in response');
     });
 
     it(`should get park's specific ropeway`, async () => {
@@ -117,7 +112,8 @@ describe('Ropeways spec.', () => {
         .toBe(formatTimestamp(createdRopeway.createdAt), 'created at is incorrect');
       expect(deletedRopeway.updatedAt)
         .not.toBe(createdRopeway.updatedAt, 'updated at is incorrect');
-      expect(deletedRopeway.deletedAt).toBe(deletedRopeway.deletedAt, 'deleted at is not null');
+      expect(deletedRopeway.deletedAt).not.toBeUndefined('deleted at is undefined');
+      expect(deletedRopeway.deletedAt).not.toBeNull('deleted at is null');
 
       const res = await request(app)
         .get(`/parks/${parkId}/ropeways/${deletedRopeway.id}`);

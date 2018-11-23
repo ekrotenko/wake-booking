@@ -59,6 +59,10 @@ class SchedulesService {
   async updateRopewaysSchedule(schedule, scheduleData) {
     return schedule.update(scheduleData);
   }
+
+  async deleteRopewaySchedule(schedule) {
+    return schedule.destroy();
+  }
 }
 
 module.exports = new SchedulesService(Schedule, ropewaysService);

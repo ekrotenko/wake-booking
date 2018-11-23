@@ -2,17 +2,6 @@ const faker = require('faker');
 const moment = require('moment');
 
 const dateFormat = 'YYYY-MM-DD';
-const timeFormat = 'HH:mm';
-
-function validDateTo() {
-  const amountOfMonths = 3;
-  return moment().add(amountOfMonths, 'months').format(dateFormat);
-}
-
-function validDateFrom() {
-  const amountOfMonths = 2;
-  return moment().subtract(amountOfMonths, 'months').format(dateFormat);
-}
 
 function randomWeekMask() {
   let workingDaysAmount = faker.random.number({min: 1, max: 7});
@@ -53,7 +42,7 @@ function generateNotIntersectedDates(amount) {
   return dates;
 }
 
-let notIntersectedDates = generateNotIntersectedDates(6);
+let notIntersectedDates = generateNotIntersectedDates(10);
 notIntersectedDates = faker.helpers.shuffle(notIntersectedDates);
 
 module.exports = {

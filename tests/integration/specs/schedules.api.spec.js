@@ -71,15 +71,18 @@ describe('Schedule spec.', () => {
 
       const scheduleData = newScheduleData();
 
-      await request(app)
+      const createdSchedule = (await request(app)
         .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
-        .send(scheduleData);
+        .send(scheduleData)).body;
 
       const res = await request(app)
         .get(`/parks/${parkId}/ropeways/${ropewayId}/schedules`);
 
+      const isPresentInResponse = res.body.some(schedule => schedule.id === createdSchedule.id);
+
       expect(res.statusCode).toBe(200, `Status code is not correct.`);
       expect(res.body.length).toBeGreaterThan(0, 'Count of ropeways is incorrect');
+      expect(isPresentInResponse).toBe(true,'Created schedule is not present in response');
     });
 
     it(`should get ropeway's specific schedule`, async () => {
@@ -108,7 +111,7 @@ describe('Schedule spec.', () => {
       expect(returnedSchedule.deletedAt).toBe(null, 'deleted at is not null');
     });
 
-    it(`should update park's specific ropeway`, async () => {
+    it(`should update ropeway's specific schedule`, async () => {
       const {parkId, ropewayId} = initialRopeway;
       const updateData = updateScheduleData();
       const createdSchedule = (await request(app)
@@ -135,32 +138,38 @@ describe('Schedule spec.', () => {
         .not.toBe(createdSchedule.updatedAt, 'updated at is incorrect');
       expect(updatedSchedule.deletedAt).toBe(null, 'deleted at is not null');
     });
-    //
-    // it(`should delete park's specific ropeway`, async () => {
-    //   const createdRopeway = (await request(app)
-    //     .post(`/parks/${parkId}/ropeways`)
-    //     .send(newRopeway()))
-    //     .body;
-    //
-    //   const deleteRes = await request(app)
-    //     .delete(`/parks/${parkId}/ropeways/${createdSchedule.id}`);
-    //
-    //   const deletedRopeway = deleteRes.body;
-    //
-    //   expect(deleteRes.statusCode).toBe(200, `Status code is not correct.`);
-    //   expect(deletedRopeway.name).toBe(createdSchedule.name, 'Name is incorrect');
-    //   expect(deletedRopeway.description).toBe(createdSchedule.description, 'Description is not correct');
-    //   expect(formatTimestamp(deletedRopeway.createdAt))
-    //     .toBe(formatTimestamp(createdSchedule.createdAt), 'created at is incorrect');
-    //   expect(deletedRopeway.updatedAt)
-    //     .not.toBe(createdSchedule.updatedAt, 'updated at is incorrect');
-    //   expect(deletedRopeway.deletedAt).toBe(deletedRopeway.deletedAt, 'deleted at is not null');
-    //
-    //   const res = await request(app)
-    //     .get(`/parks/${parkId}/ropeways/${deletedRopeway.id}`);
-    //
-    //   expect(res.statusCode).toBe(404, 'Status code is not correct');
-    // });
+
+    it(`should delete ropeway's specific schedule`, async () => {
+      const {parkId, ropewayId} = initialRopeway;
+      const createdSchedule = (await request(app)
+        .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+        .send(newScheduleData()))
+        .body;
+
+      const deleteRes = await request(app)
+        .delete(`/parks/${parkId}/ropeways/${ropewayId}/schedules/${createdSchedule.id}`);
+      const deletedSchedule = deleteRes.body;
+
+      expect(deleteRes.statusCode).toBe(200, `Status code is not correct.`);
+      expect(deletedSchedule.dateFrom).toBe(createdSchedule.dateFrom, 'Date from is incorrect');
+      expect(deletedSchedule.dateTo).toBe(createdSchedule.dateTo, 'Date to is incorrect');
+      expect(deletedSchedule.timeFrom).toContain(createdSchedule.timeFrom, 'Time from is not correct');
+      expect(deletedSchedule.timeTo).toContain(createdSchedule.timeTo, 'Time to is not correct');
+      expect(deletedSchedule.duration).toBe(createdSchedule.duration, 'Duration is not correct');
+      expect(deletedSchedule.interval).toBe(createdSchedule.interval, 'Interval is not correct');
+      expect(deletedSchedule.weekMask).toBe(createdSchedule.weekMask, 'Interval is not correct');
+      expect(formatTimestamp(deletedSchedule.createdAt))
+        .toBe(formatTimestamp(createdSchedule.createdAt), 'created at is incorrect');
+      expect(deletedSchedule.updatedAt)
+        .not.toBe(createdSchedule.updatedAt, 'updated at is incorrect');
+      expect(deletedSchedule.deletedAt).not.toBeNull('deleted at is null');
+      expect(deletedSchedule.deletedAt).not.toBeUndefined('deleted at is undefined');
+
+      const res = await request(app)
+        .get(`/parks/${parkId}/ropeways/${ropewayId}/schedules/${deletedSchedule.id}`);
+
+      expect(res.statusCode).toBe(404, 'Status code is not correct');
+    });
   });
 });
 
