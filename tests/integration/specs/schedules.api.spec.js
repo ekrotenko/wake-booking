@@ -1,4 +1,5 @@
 const request = require('supertest');
+const using = require('jasmine-data-provider');
 const app = require('../../../app');
 const {newPark} = require('../data/parks');
 const {newUser} = require('../data/user');
@@ -8,6 +9,9 @@ const {
   newScheduleData,
   defaultValues,
   updateScheduleData,
+  validation,
+  payloadWithoutDates,
+  scheduleForDelete
 } = require('../data/schedules');
 const {formatTimestamp} = require('../helpers');
 
@@ -21,7 +25,7 @@ describe('Schedule spec.', () => {
   describe('Positive flow.', () => {
 
     it('should create new schedule with default values', async () => {
-      const scheduleData = newScheduleWithDefaultValues;
+      const scheduleData = newScheduleWithDefaultValues();
       const {parkId, ropewayId} = initialRopeway;
 
       const res = await request(app)
@@ -71,9 +75,11 @@ describe('Schedule spec.', () => {
 
       const scheduleData = newScheduleData();
 
-      const createdSchedule = (await request(app)
+      const resSchedule = (await request(app)
         .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
-        .send(scheduleData)).body;
+        .send(scheduleData));
+
+      const createdSchedule = resSchedule.body;
 
       const res = await request(app)
         .get(`/parks/${parkId}/ropeways/${ropewayId}/schedules`);
@@ -81,7 +87,7 @@ describe('Schedule spec.', () => {
       const isPresentInResponse = res.body.some(schedule => schedule.id === createdSchedule.id);
 
       expect(res.statusCode).toBe(200, `Status code is not correct.`);
-      expect(res.body.length).toBeGreaterThan(0, 'Count of ropeways is incorrect');
+      expect(res.body.length).toBeGreaterThan(0, 'Count of schedules is incorrect');
       expect(isPresentInResponse).toBe(true, 'Created schedule is not present in response');
     });
 
@@ -143,7 +149,7 @@ describe('Schedule spec.', () => {
       const {parkId, ropewayId} = initialRopeway;
       const createdSchedule = (await request(app)
         .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
-        .send(newScheduleData()))
+        .send(scheduleForDelete()))
         .body;
 
       const deleteRes = await request(app)
@@ -174,6 +180,29 @@ describe('Schedule spec.', () => {
 
   describe('Negative flow.', () => {
 
+    describe('Invalid date interval', () => {
+
+      beforeAll(async () => {
+        const {parkId, ropewayId} = initialRopeway;
+        const scheduleData = newScheduleData();
+        const res = await request(app)
+          .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+          .send(scheduleData);
+        expect(res.statusCode).toBe(201, 'Precondition reserved schedule has not been created');
+      });
+
+      using(validation.dates, (values, description) => {
+        it(`'${description}' should not create schedule`, async () => {
+          const payload = Object.assign(values(), payloadWithoutDates);
+          const {parkId, ropewayId} = initialRopeway;
+          const res = await request(app)
+            .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+            .send(payload);
+
+          expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
+        })
+      })
+    })
   })
 });
 
@@ -186,14 +215,17 @@ async function preparePrecondition() {
   userId = (await request(app)
     .post('/users')
     .send(newUser())).body.id;
+  expect(userId).not.toBeUndefined('User has not been created');
 
   parkId = (await request(app)
     .post(`/users/${userId}/parks`)
     .send(newPark())).body.park.id;
+  expect(parkId).not.toBeUndefined('Park has not been created');
 
   ropewayId = (await request(app)
     .post(`/parks/${parkId}/ropeways`)
     .send(newRopeway())).body.id;
+  expect(ropewayId).not.toBeUndefined('Ropeway has not been created');
 
   return {parkId, ropewayId};
 }

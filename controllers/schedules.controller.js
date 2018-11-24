@@ -23,11 +23,7 @@ class SchedulesController {
 
   async addScheduleForRopeway(req, res, next) {
     try {
-      if (await this.schedulesService.isScheduleIntersected(req.ropeway, req.body)) {
-        const error = new Error('Schedule dates conflict');
-        error.status = 422;
-        throw error;
-      }
+      await this.schedulesService.validateSchedule(req.ropeway, req.body);
       res.status(201).send(await this.schedulesService
         .addRopewaySchedule(req.ropeway, req.body));
     } catch (error) {

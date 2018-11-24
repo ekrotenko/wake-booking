@@ -45,7 +45,7 @@ describe('Users spec.', () => {
           .get(url);
 
         expect(res.statusCode).toBe(200, 'Status code is not correct');
-        expect(res.body.length).toBeGreaterThan(1, 'Users list is empty');
+        expect(res.body.length).toBeGreaterThanOrEqual(1, 'Users list is empty');
       });
 
       it('should return specific user', async () => {

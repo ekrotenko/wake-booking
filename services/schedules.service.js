@@ -31,6 +31,22 @@ class SchedulesService {
     return ropewaySchedule;
   }
 
+  async addRopewaySchedule(ropeway, scheduleData) {
+    return ropeway.createSchedule(scheduleData);
+  }
+
+  async getRopewaysSchedules(ropeway) {
+    return ropeway.getSchedules();
+  }
+
+  async updateRopewaysSchedule(schedule, scheduleData) {
+    return schedule.update(scheduleData);
+  }
+
+  async deleteRopewaySchedule(schedule) {
+    return schedule.destroy();
+  }
+
   async isScheduleIntersected(ropeway, scheduleData) {
     const schedules = await this.getRopewaysSchedules(ropeway);
 
@@ -48,20 +64,16 @@ class SchedulesService {
     return false;
   }
 
-  async addRopewaySchedule(ropeway, scheduleData) {
-    return ropeway.createSchedule(scheduleData);
-  }
+  async validateSchedule(ropeway, schedule) {
+    const isIntersected = await this.isScheduleIntersected(ropeway, schedule);
+    const isDateToInPast = moment(schedule.dateTo).isBefore(moment());
+    const isDateFromSameOrAfterDateTo = moment(schedule.dateFrom).isSameOrAfter(schedule.dateTo);
 
-  async getRopewaysSchedules(ropeway) {
-    return ropeway.getSchedules();
-  }
-
-  async updateRopewaysSchedule(schedule, scheduleData) {
-    return schedule.update(scheduleData);
-  }
-
-  async deleteRopewaySchedule(schedule) {
-    return schedule.destroy();
+    if (isIntersected || isDateToInPast || isDateFromSameOrAfterDateTo) {
+      const error = new Error('Schedules dates conflict');
+      error.status = 422;
+      throw error;
+    }
   }
 }
 
