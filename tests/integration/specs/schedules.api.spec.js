@@ -202,7 +202,21 @@ describe('Schedule spec.', () => {
           expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
         })
       })
-    })
+    });
+
+    describe(`Invalid time interval`, ()=>{
+      using(validation.time, (values, description) => {
+        it(`'${description}' should not create schedule`, async () => {
+          const payload = values();
+          const {parkId, ropewayId} = initialRopeway;
+          const res = await request(app)
+            .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+            .send(payload);
+
+          expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
+        })
+      })
+    });
   })
 });
 

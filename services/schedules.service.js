@@ -64,13 +64,29 @@ class SchedulesService {
     return false;
   }
 
-  async validateSchedule(ropeway, schedule) {
+  async validateScheduleDates(ropeway, schedule) {
     const isIntersected = await this.isScheduleIntersected(ropeway, schedule);
     const isDateToInPast = moment(schedule.dateTo).isBefore(moment());
     const isDateFromSameOrAfterDateTo = moment(schedule.dateFrom).isSameOrAfter(schedule.dateTo);
 
     if (isIntersected || isDateToInPast || isDateFromSameOrAfterDateTo) {
       const error = new Error('Schedules dates conflict');
+      error.status = 422;
+      throw error;
+    }
+  }
+
+  validateScheduleTimeRange(schedule) {
+    const timeFormat = 'HH:mm';
+    const momentTimeFrom = moment(schedule.timeFrom, timeFormat);
+    const momentTimeTo = moment(schedule.timeTo, timeFormat);
+    const timeRangeDuration = Moment.duration(momentTimeTo.diff(momentTimeFrom), 'ms').asMinutes();
+
+    const isTimeToLessThanTimeFrom = moment(momentTimeTo).isSameOrBefore(momentTimeFrom);
+    const isTimeRangeLessThanDuration = timeRangeDuration < schedule.duration;
+
+    if (isTimeToLessThanTimeFrom || isTimeRangeLessThanDuration) {
+      const error = new Error('Invalid time interval');
       error.status = 422;
       throw error;
     }

@@ -2,6 +2,7 @@ const faker = require('faker');
 const moment = require('moment');
 
 const dateFormat = 'YYYY-MM-DD';
+const timeFormat = 'HH:mm';
 
 let notIntersectedDates = generateNotIntersectedDates(10);
 let usedValidDateRanges = [];
@@ -143,7 +144,40 @@ module.exports = {
           dateTo: dateFrom
         }
       }
+    },
+    time: {
+      timeToLessThanDuration() {
+        const {duration} = getValidDurationAndInterval();
+        let randomHour = faker.random.number({min: 5, max: 22});
+        let randomMinutes = faker.random.number({min: 0, max: 60});
+        randomHour = randomHour.length < 1 ? `0${randomMinutes}` : randomHour;
+        randomMinutes = randomMinutes.length < 1 ? `0${randomMinutes}` : randomMinutes;
+        const timeFrom = `${randomHour}:${randomMinutes}`;
+        const timeTo = moment(timeFrom, timeFormat)
+          .add(duration, 'minutes')
+          .subtract(faker.random.number({min: 1, max: duration - 1}))
+          .format(timeFormat);
+
+        return Object.assign({},
+          notIntersectedDates[0],
+          {
+            timeFrom,
+            timeTo,
+            duration
+          })
+      },
+      timeToLessThanTimeFrom() {
+        const timeTo = moment().format(timeFormat);
+        const timeFrom = moment().add(2, 'hours').format(timeFormat);
+
+        return Object.assign({},
+          notIntersectedDates[0],
+          {
+            timeFrom,
+            timeTo
+          }
+        )
+      }
     }
   }
-
 };

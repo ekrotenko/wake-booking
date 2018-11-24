@@ -23,7 +23,9 @@ class SchedulesController {
 
   async addScheduleForRopeway(req, res, next) {
     try {
-      await this.schedulesService.validateSchedule(req.ropeway, req.body);
+      await this.schedulesService.validateScheduleDates(req.ropeway, req.body);
+      this.schedulesService.validateScheduleTimeRange(req.body);
+
       res.status(201).send(await this.schedulesService
         .addRopewaySchedule(req.ropeway, req.body));
     } catch (error) {
