@@ -1,4 +1,4 @@
-const {Ropeway} = require('../models');
+const { Ropeway } = require('../models');
 
 class RopewaysService {
   constructor(ropewaysModel) {

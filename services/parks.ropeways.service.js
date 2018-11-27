@@ -1,7 +1,4 @@
 class ParksRopewaysService {
-  constructor(parksService) {
-  }
-
   async createRopewayInPark(park, ropewayData) {
     return park.createRopeway(ropewayData);
   }

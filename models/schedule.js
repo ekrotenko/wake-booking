@@ -1,11 +1,5 @@
-const moment = require('moment');
-// TODO: add order add/cancel time options
-
 module.exports = (sequelize, DataTypes) => {
   class Schedule extends sequelize.Model {
-    // static associate(models) {
-    //     Schedule.belongsTo(models.Ropeway, {foreignKey: 'scheduleId'});
-    // }
   }
 
   Schedule.init({
@@ -29,43 +23,53 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 60,
-      validation: {
-        min: 10,
-        max: 60,
-        multiple() {
-          if (this.duration % 5) {
-            throw new Error('Should be multiple of 5 minutes');
-          }
+      validate: {
+        isIn: {
+          args: [[30, 60, 90, 120]],
+          msg: 'Invalid duration',
         },
       },
     },
     interval: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 30,
-      validation: {
-        min: 1,
-        max: 60,
-        multiple() {
-          if (this.duration % 5) {
-            throw new Error('Should be multiple of 5 minutes');
-          }
+      validate: {
+        isIn: {
+          args: [[5, 10, 15, 30, 60, 90, 120]],
+          msg: 'Invalid interval',
         },
       },
     },
     weekMask: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 127,
+      defaultValue: '1111111',
       validate: {
-        min: 0,
-        max: 127,
+        is: {
+          args: /^[0,1]{7}$/,
+          msg: 'Invalid week mask',
+        },
       },
     },
   }, {
     sequelize,
     tableName: 'schedules',
     paranoid: true,
+    hooks: {
+      beforeValidate(schedule) {
+        if (!schedule.interval) {
+          schedule.interval = schedule.duration;
+        }
+      },
+    },
+    validate: {
+      intervalShouldBeLessThanOrEqualDuration() {
+        if (this.interval > this.duration) {
+          throw new Error('Invalid interval');
+        }
+      },
+    },
+
     scopes: {
       belongsToRopeway(ropewayId) {
         return {
@@ -81,23 +85,6 @@ module.exports = (sequelize, DataTypes) => {
             dateTo: { [sequelize.Op.gte]: new Date(date) },
           },
         };
-      },
-    },
-    validate: {
-      isIntersected() {
-        return Schedule.findAll({
-          where: { ropewayId: { [sequelize.Op.eq]: this.ropewayId } },
-        })
-          .then((schedules) => {
-            if (schedules.length) {
-              // FIXME: fix add schedule after some one
-              const intersections = schedules.filter(sc => moment(sc.dateFrom).isSameOrBefore(moment(this.dateFrom)) ||
-                                    moment(sc.dateTo).isSameOrAfter(moment(this.dateTo)));
-              if (intersections.length) {
-                throw new Error('Schedule dates conflict');
-              }
-            }
-          });
       },
     },
   });
