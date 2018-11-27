@@ -1,5 +1,6 @@
 const faker = require('faker');
 const moment = require('moment');
+const randomString = require('random-string');
 
 const dateFormat = 'YYYY-MM-DD';
 const timeFormat = 'HH:mm';
@@ -7,14 +8,14 @@ const timeFormat = 'HH:mm';
 let notIntersectedDates = generateNotIntersectedDates(10);
 let usedValidDateRanges = [];
 
-function randomWeekMask() {
-  let workingDaysAmount = faker.random.number({min: 1, max: 7});
+function randomWeekMask(max = 7) {
+  let workingDaysAmount = faker.random.number({min: 1, max});
   let daysArray = [];
   while (workingDaysAmount > 0) {
     daysArray.push('1');
     workingDaysAmount--;
   }
-  while (daysArray.length !== 7) {
+  while (daysArray.length !== max) {
     daysArray.push('0');
   }
 
@@ -74,6 +75,7 @@ const validTimeRange = {
 };
 
 notIntersectedDates = faker.helpers.shuffle(notIntersectedDates);
+const payloadWithoutDates = Object.assign({weekMask: randomWeekMask()}, validTimeRange, getValidDurationAndInterval());
 
 module.exports = {
   defaultValues: {
@@ -81,7 +83,7 @@ module.exports = {
     duration: 60,
     interval: 30,
   },
-  payloadWithoutDates: Object.assign({weekMask: randomWeekMask()}, validTimeRange, getValidDurationAndInterval()),
+  payloadWithoutDates,
   newScheduleWithDefaultValues() {
     return Object.assign({},
       getValidDateRange(),
@@ -119,30 +121,33 @@ module.exports = {
       'dateToInPast': () => {
         const dateTo = moment().subtract(1, 'day').format(dateFormat);
         const dateFrom = moment(dateTo).subtract(2, 'months').format(dateFormat);
-        return {dateFrom, dateTo}
+        return Object.assign(payloadWithoutDates, {dateFrom, dateTo});
       },
       'intersectedRange': () => {
         const {dateFrom: usedDateFrom, dateTo: usedDateTo} = usedValidDateRanges[0];
         const intersectedDateFrom = moment(usedDateFrom).add(1, 'week').format(dateFormat);
         const intersectedDateTo = moment(usedDateTo).add(1, 'week').format(dateFormat);
-        return {
-          dateFrom: intersectedDateFrom,
-          dateTo: intersectedDateTo,
-        }
+        return Object.assign(payloadWithoutDates,
+          {
+            dateFrom: intersectedDateFrom,
+            dateTo: intersectedDateTo,
+          });
       },
       'equalDateFromAndTo': () => {
         const {dateFrom} = notIntersectedDates[0];
-        return {
-          dateFrom,
-          dateTo: dateFrom
-        }
+        return Object.assign(payloadWithoutDates,
+          {
+            dateFrom,
+            dateTo: dateFrom
+          });
       },
       'dateToBeforeDateFrom': () => {
         const {dateFrom, dateTo} = notIntersectedDates[0];
-        return {
-          dateFrom: dateTo,
-          dateTo: dateFrom
-        }
+        return Object.assign(payloadWithoutDates,
+          {
+            dateFrom: dateTo,
+            dateTo: dateFrom
+          });
       }
     },
     time: {
@@ -167,8 +172,9 @@ module.exports = {
           })
       },
       timeToLessThanTimeFrom() {
-        const timeTo = moment().format(timeFormat);
-        const timeFrom = moment().add(2, 'hours').format(timeFormat);
+        const randomHour = faker.random.number({min: 0, max: 12});
+        const timeTo = `${randomHour}:00`;
+        const timeFrom = moment(timeTo, timeFormat).add(7, 'hours').format(timeFormat);
 
         return Object.assign({},
           notIntersectedDates[0],
@@ -176,6 +182,61 @@ module.exports = {
             timeFrom,
             timeTo
           }
+        )
+      }
+    },
+    interval: {
+      greaterThanDuration() {
+        const duration = randomDuration();
+        const interval = duration + 1;
+        return Object.assign({
+            duration,
+            interval,
+          },
+          notIntersectedDates[0],
+          validTimeRange,
+        )
+      },
+      notAllowedValue() {
+        let {duration, interval} = getValidDurationAndInterval();
+        interval--;
+        return Object.assign({
+            duration,
+            interval,
+          },
+          notIntersectedDates[0],
+          validTimeRange,
+        )
+      }
+    },
+    duration: {
+      notAllowedValue() {
+        let {duration, interval} = getValidDurationAndInterval();
+        duration++;
+        return Object.assign({
+            duration,
+            interval,
+          },
+          notIntersectedDates[0],
+          validTimeRange,
+        )
+      }
+    },
+    weekMask: {
+      invalidLength() {
+        let maxLength = faker.random.number({min: 1, max: 20});
+        maxLength = maxLength === 7 ? maxLength - 1 : maxLength;
+        const weekMask = randomWeekMask(maxLength);
+        return Object.assign({weekMask},
+          notIntersectedDates[0],
+          validTimeRange,
+        )
+      },
+      invalidContent() {
+        const weekMask = randomString({length: 7});
+        return Object.assign({weekMask},
+          notIntersectedDates[0],
+          validTimeRange,
         )
       }
     }

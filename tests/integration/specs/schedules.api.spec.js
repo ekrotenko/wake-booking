@@ -180,44 +180,32 @@ describe('Schedule spec.', () => {
 
   describe('Negative flow.', () => {
 
-    describe('Invalid date interval', () => {
+    beforeAll(async () => {
+      const {parkId, ropewayId} = initialRopeway;
+      const scheduleData = newScheduleData();
+      const res = await request(app)
+        .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+        .send(scheduleData);
+      expect(res.statusCode).toBe(201, 'Precondition reserved schedule has not been created');
+    });
 
-      beforeAll(async () => {
-        const {parkId, ropewayId} = initialRopeway;
-        const scheduleData = newScheduleData();
-        const res = await request(app)
-          .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
-          .send(scheduleData);
-        expect(res.statusCode).toBe(201, 'Precondition reserved schedule has not been created');
+    using(validation, (validationData, validationType)=>{
+      describe(`Invalid ${validationType}`, () => {
+
+        using(validationData, (values, description) => {
+          it(`'${description}' should not create schedule`, async () => {
+            const payload = values();
+            const {parkId, ropewayId} = initialRopeway;
+            const res = await request(app)
+              .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+              .send(payload);
+
+            expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
+          });
+        });
       });
-
-      using(validation.dates, (values, description) => {
-        it(`'${description}' should not create schedule`, async () => {
-          const payload = Object.assign(values(), payloadWithoutDates);
-          const {parkId, ropewayId} = initialRopeway;
-          const res = await request(app)
-            .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
-            .send(payload);
-
-          expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
-        })
-      })
     });
-
-    describe(`Invalid time interval`, ()=>{
-      using(validation.time, (values, description) => {
-        it(`'${description}' should not create schedule`, async () => {
-          const payload = values();
-          const {parkId, ropewayId} = initialRopeway;
-          const res = await request(app)
-            .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
-            .send(payload);
-
-          expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
-        })
-      })
-    });
-  })
+  });
 });
 
 
