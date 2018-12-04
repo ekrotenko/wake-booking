@@ -10,7 +10,6 @@ const {
   defaultValues,
   updateScheduleData,
   validation,
-  payloadWithoutDates,
   scheduleForDelete
 } = require('../data/schedules');
 const {formatTimestamp} = require('../helpers');

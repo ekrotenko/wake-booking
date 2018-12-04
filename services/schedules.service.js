@@ -1,10 +1,6 @@
 const { Schedule } = require('../models');
 const ropewaysService = require('./ropeways.service');
 
-const Moment = require('moment');
-const MomentRange = require('moment-range');
-
-const moment = MomentRange.extendMoment(Moment);
 
 class SchedulesService {
   constructor(scheduleModel, ropewayService) {
@@ -45,51 +41,6 @@ class SchedulesService {
 
   async deleteRopewaySchedule(schedule) {
     return schedule.destroy();
-  }
-
-  async isScheduleIntersected(ropeway, scheduleData) {
-    const schedules = await this.getRopewaysSchedules(ropeway);
-
-    if (schedules.length) {
-      const newScheduleRange = moment.range(moment(scheduleData.dateFrom), moment(scheduleData.dateTo));
-      const intersections = schedules.filter((sc) => {
-        const existingScheduleRange = moment.range(moment(sc.dateFrom), moment(sc.dateTo));
-
-        return newScheduleRange.intersect(existingScheduleRange);
-      });
-
-      return intersections.length > 0;
-    }
-
-    return false;
-  }
-
-  async validateScheduleDates(ropeway, schedule) {
-    const isIntersected = await this.isScheduleIntersected(ropeway, schedule);
-    const isDateToInPast = moment(schedule.dateTo).isBefore(moment());
-    const isDateFromSameOrAfterDateTo = moment(schedule.dateFrom).isSameOrAfter(schedule.dateTo);
-
-    if (isIntersected || isDateToInPast || isDateFromSameOrAfterDateTo) {
-      const error = new Error('Schedules dates conflict');
-      error.status = 422;
-      throw error;
-    }
-  }
-
-  validateScheduleTimeRange(schedule) {
-    const timeFormat = 'HH:mm';
-    const momentTimeFrom = moment(schedule.timeFrom, timeFormat);
-    const momentTimeTo = moment(schedule.timeTo, timeFormat);
-    const timeRangeDuration = Moment.duration(momentTimeTo.diff(momentTimeFrom), 'ms').asMinutes();
-
-    const isTimeToLessThanTimeFrom = moment(momentTimeTo).isSameOrBefore(momentTimeFrom);
-    const isTimeRangeLessThanDuration = timeRangeDuration < schedule.duration;
-
-    if (isTimeToLessThanTimeFrom || isTimeRangeLessThanDuration) {
-      const error = new Error('Invalid time interval');
-      error.status = 422;
-      throw error;
-    }
   }
 }
 

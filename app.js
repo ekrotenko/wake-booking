@@ -38,6 +38,9 @@ app.use('/inaccessible_slots', inaccessibleSlots);
 app.use('*', (req, res) => {
   res.send('This is default route');
 });
+
+app.use(require('./libs/helpers/payload-validation-helper').middleware);
+
 app.use((err, req, res, next) => {
   if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
     err.status = 422;

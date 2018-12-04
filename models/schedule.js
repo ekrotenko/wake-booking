@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: '1111111',
       validate: {
         is: {
-          args: /^[0,1]{7}$/,
+          args: /^(?!0{7})[0,1]{7}$/,
           msg: 'Invalid week mask',
         },
       },
@@ -64,7 +64,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     validate: {
       intervalShouldBeLessThanOrEqualDuration() {
-        if (this.interval > this.duration) {
+        if (+this.interval > +this.duration) {
           throw new Error('Invalid interval');
         }
       },
