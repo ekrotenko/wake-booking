@@ -148,6 +148,35 @@ module.exports = {
             dateFrom: dateTo,
             dateTo: dateFrom
           });
+      },
+      'dateFromLaterMaximumBefore': () => {
+        const dateFrom = moment()
+          .subtract(3, 'month')
+          .format(dateFormat);
+        const dateTo = moment()
+          .add(3, 'month')
+          .format(dateFormat);
+        return Object.assign(payloadWithoutDates,
+          {
+            dateFrom,
+            dateTo,
+          });
+      },
+      'randomStringInDate': () => {
+        return Object.assign(payloadWithoutDates,
+          {
+            dateFrom: randomString({length: 10}),
+            dateTo: randomString({length: 10}),
+          });
+      },
+      'invalidFormat': () => {
+        const invalidFormat = 'DD/MM/YYYY';
+        const {dateFrom, dateTo} = Object.assign({}, notIntersectedDates[0]);
+        return Object.assign(payloadWithoutDates,
+          {
+            dateFrom: moment(dateFrom, dateFormat).format(invalidFormat),
+            dateTo: moment(dateTo, dateFormat).format(invalidFormat),
+          });
       }
     },
     time: {
@@ -234,6 +263,13 @@ module.exports = {
       },
       invalidContent() {
         const weekMask = randomString({length: 7});
+        return Object.assign({weekMask},
+          notIntersectedDates[0],
+          validTimeRange,
+        )
+      },
+      zeroOnly() {
+        const weekMask = '0000000';
         return Object.assign({weekMask},
           notIntersectedDates[0],
           validTimeRange,

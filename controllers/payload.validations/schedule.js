@@ -10,7 +10,9 @@ module.exports = {
     dateFrom: Joi
       .date()
       .required()
-      .format(dateFormat),
+      .format(dateFormat)
+      .greater(moment().subtract(3, 'months').format(dateFormat))
+    ,
     dateTo: Joi
       .date()
       .required()
@@ -27,18 +29,17 @@ module.exports = {
       .greater(Joi.ref('timeFrom'))
       .error(error => {
         const dateGreaterError = error.filter(e => e.type === 'date.greater');
-        if(dateGreaterError.length>0){
+        if (dateGreaterError.length > 0) {
           return `"timeTo" must be greater than "${moment(dateGreaterError[0].context.limit)
             .format(timeFormat)}"`
         }
         return error;
       })
-      ,
+    ,
     duration: Joi
       .number()
       .integer()
       .valid(30, 60, 90, 120)
-    // .max(moment(Joi.ref('timeFrom'), timeFormat).diff(moment(Joi.ref('timeTo'), timeFormat), 'minutes'))
       .default(60),
     interval: Joi
       .number()
@@ -46,11 +47,52 @@ module.exports = {
       .valid(5, 10, 15, 30, 60, 90, 120)
       .max(Joi.ref('duration'))
       .default(Joi.ref('duration'))
-      ,
+    ,
     weekMask: Joi
       .string()
       .length(7)
       .regex(/^(?!0{7})[0,1]+$/, '0 and 1 only')
       .default('1111111'),
+  }),
+  joiPutValidator: Joi.object().options({abortEarly: false}).keys({
+    dateFrom: Joi
+      .date()
+      .format(dateFormat)
+      .greater(moment().subtract(3, 'months').format(dateFormat))
+    ,
+    dateTo: Joi
+      .date()
+      .format(dateFormat)
+      .greater(Joi.ref('dateFrom')),
+    timeFrom: Joi
+      .date()
+      .format(timeFormat),
+    timeTo: Joi
+      .date()
+      .format(timeFormat)
+      .greater(Joi.ref('timeFrom'))
+      .error(error => {
+        const dateGreaterError = error.filter(e => e.type === 'date.greater');
+        if (dateGreaterError.length > 0) {
+          return `"timeTo" must be greater than "${moment(dateGreaterError[0].context.limit)
+            .format(timeFormat)}"`
+        }
+        return error;
+      })
+    ,
+    duration: Joi
+      .number()
+      .integer()
+      .valid(30, 60, 90, 120),
+    interval: Joi
+      .number()
+      .integer()
+      .valid(5, 10, 15, 30, 60, 90, 120)
+      .max(Joi.ref('duration'))
+    ,
+    weekMask: Joi
+      .string()
+      .length(7)
+      .regex(/^(?!0{7})[0,1]+$/, '0 and 1 only')
   })
 };

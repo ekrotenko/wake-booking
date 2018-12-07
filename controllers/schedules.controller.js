@@ -1,6 +1,6 @@
 const scheduleService = require('../services/schedules.service');
 const payloadValidator = require('../libs/helpers/payload-validation-helper');
-const validator = require('./body.validations/schedule');
+const validator = require('./payload.validations/schedule');
 
 const Moment = require('moment');
 const MomentRange = require('moment-range');
@@ -43,9 +43,16 @@ class SchedulesController {
   }
 
   async updateSchedule(req, res, next) {
-    res.send(await this.schedulesService
-      .updateRopewaysSchedule(req.schedule, req.body)
-      .catch(next));
+    try {
+      payloadValidator.joiValidate(req.body, validator.joiPutValidator);
+      await this.__validateScheduleDates(req.ropeway, req.body);
+      this.__validateScheduleTimeRange(req.body);
+
+      res.send(await this.schedulesService
+        .updateRopewaysSchedule(req.schedule, req.body));
+    } catch (error) {
+      next(new payloadValidator.errors.PayloadValidationError(error, error.message));
+    }
   }
 
   async getRopewaySchedules(req, res, next) {

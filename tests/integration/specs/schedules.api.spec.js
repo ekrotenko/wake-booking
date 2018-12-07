@@ -179,31 +179,55 @@ describe('Schedule spec.', () => {
 
   describe('Negative flow.', () => {
 
+    let preconditionScheduleId;
+
     beforeAll(async () => {
       const {parkId, ropewayId} = initialRopeway;
       const scheduleData = newScheduleData();
       const res = await request(app)
         .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
         .send(scheduleData);
+      preconditionScheduleId = res.body.id;
       expect(res.statusCode).toBe(201, 'Precondition reserved schedule has not been created');
     });
 
-    using(validation, (validationData, validationType)=>{
-      describe(`Invalid ${validationType}`, () => {
+    describe('Create schedule with', ()=>{
+      using(validation, (validationData, validationType)=>{
+        describe(`invalid ${validationType}:`, () => {
 
-        using(validationData, (values, description) => {
-          it(`'${description}' should not create schedule`, async () => {
-            const payload = values();
-            const {parkId, ropewayId} = initialRopeway;
-            const res = await request(app)
-              .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
-              .send(payload);
+          using(validationData, (values, description) => {
+            it(`'${description}' should not create schedule`, async () => {
+              const payload = values();
+              const {parkId, ropewayId} = initialRopeway;
+              const res = await request(app)
+                .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+                .send(payload);
 
-            expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
+              expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
+            });
           });
         });
       });
     });
+
+    describe('Update schedule with', ()=>{
+      using(validation, (validationData, validationType)=>{
+        describe(`invalid ${validationType}:`, () => {
+
+          using(validationData, (values, description) => {
+            it(`'${description}' should not update schedule`, async () => {
+              const payload = values();
+              const {parkId, ropewayId} = initialRopeway;
+              const res = await request(app)
+                .put(`/parks/${parkId}/ropeways/${ropewayId}/schedules/${preconditionScheduleId}`)
+                .send(payload);
+
+              expect(res.statusCode).toBe(422, `Incorrect status code for ${description}`);
+            });
+          });
+        });
+      });
+    })
   });
 });
 
