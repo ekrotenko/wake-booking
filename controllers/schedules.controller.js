@@ -45,8 +45,12 @@ class SchedulesController {
   async updateSchedule(req, res, next) {
     try {
       payloadValidator.joiValidate(req.body, validator.joiPutValidator);
-      await this.__validateScheduleDates(req.ropeway, req.body, req.schedule);
-      this.__validateScheduleTimeRange(req.body);
+
+      if (req.body.dateFrom || req.body.dateTo) {
+        await this.__validateScheduleDates(req.ropeway, req.body, req.schedule);
+      }
+
+      if (req.body.timeFrom || req.body.timeTo) { this.__validateScheduleTimeRange(req.body); }
 
       res.send(await this.schedulesService
         .updateRopewaysSchedule(req.schedule, req.body));
@@ -67,11 +71,11 @@ class SchedulesController {
       .catch(next));
   }
 
-  async __isScheduleIntersected(ropeway, scheduleData, existingSchedule) {
+  async __isScheduleIntersected(ropeway, datesInterval, existingSchedule) {
     const schedules = await this.schedulesService.getRopewaysSchedules(ropeway);
 
     if (schedules.length) {
-      const newScheduleRange = moment.range(moment(scheduleData.dateFrom), moment(scheduleData.dateTo));
+      const newScheduleRange = moment.range(moment(datesInterval.dateFrom), moment(datesInterval.dateTo));
       const intersections = schedules.filter((sc) => {
         const existingScheduleRange = moment.range(moment(sc.dateFrom), moment(sc.dateTo));
 
@@ -85,9 +89,14 @@ class SchedulesController {
   }
 
   async __validateScheduleDates(ropeway, schedule, existingSchedule) {
-    const isIntersected = await this.__isScheduleIntersected(ropeway, schedule, existingSchedule);
-    const isDateToInPast = moment(schedule.dateTo).isBefore(moment());
-    const isDateFromSameOrAfterDateTo = moment(schedule.dateFrom).isSameOrAfter(schedule.dateTo);
+    const datesInterval = {
+      dateFrom: schedule.dateFrom || existingSchedule.dateFrom,
+      dateTo: schedule.dateTo || existingSchedule.dateTo,
+    };
+
+    const isIntersected = await this.__isScheduleIntersected(ropeway, datesInterval, existingSchedule);
+    const isDateToInPast = moment(datesInterval.dateTo).isBefore(moment());
+    const isDateFromSameOrAfterDateTo = moment(datesInterval.dateFrom).isSameOrAfter(datesInterval.dateTo);
 
     if (isIntersected || isDateToInPast || isDateFromSameOrAfterDateTo) {
       throw new Error('Schedules dates conflict');
