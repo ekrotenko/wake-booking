@@ -5,7 +5,7 @@ const randomString = require('random-string');
 const dateFormat = 'YYYY-MM-DD';
 const timeFormat = 'HH:mm';
 
-let notIntersectedDates = generateNotIntersectedDates(10);
+let notIntersectedDates = generateNotIntersectedDates(20);
 let usedValidDateRanges = [];
 
 function randomWeekMask(max = 7) {
@@ -98,6 +98,12 @@ module.exports = {
       getValidDurationAndInterval()
     );
   },
+  scheduleDataWithUsedDates(){
+    return Object.assign({},
+      usedValidDateRanges[usedValidDateRanges.length-1],
+      validTimeRange,
+    );
+  },
   scheduleForDelete() {
     return Object.assign({},
       notIntersectedDates[0],
@@ -124,7 +130,7 @@ module.exports = {
         return Object.assign(payloadWithoutDates, {dateFrom, dateTo});
       },
       'intersectedRange': () => {
-        const {dateFrom: usedDateFrom, dateTo: usedDateTo} = usedValidDateRanges[0];
+        const {dateFrom: usedDateFrom, dateTo: usedDateTo} = usedValidDateRanges[usedValidDateRanges.length-1];
         const intersectedDateFrom = moment(usedDateFrom).add(1, 'week').format(dateFormat);
         const intersectedDateTo = moment(usedDateTo).add(1, 'week').format(dateFormat);
         return Object.assign(payloadWithoutDates,
