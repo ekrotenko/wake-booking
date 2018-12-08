@@ -45,7 +45,7 @@ class SchedulesController {
   async updateSchedule(req, res, next) {
     try {
       payloadValidator.joiValidate(req.body, validator.joiPutValidator);
-      await this.__validateScheduleDates(req.ropeway, req.body);
+      await this.__validateScheduleDates(req.ropeway, req.body, req.schedule);
       this.__validateScheduleTimeRange(req.body);
 
       res.send(await this.schedulesService
@@ -67,7 +67,7 @@ class SchedulesController {
       .catch(next));
   }
 
-  async __isScheduleIntersected(ropeway, scheduleData) {
+  async __isScheduleIntersected(ropeway, scheduleData, existingSchedule) {
     const schedules = await this.schedulesService.getRopewaysSchedules(ropeway);
 
     if (schedules.length) {
@@ -75,7 +75,7 @@ class SchedulesController {
       const intersections = schedules.filter((sc) => {
         const existingScheduleRange = moment.range(moment(sc.dateFrom), moment(sc.dateTo));
 
-        return newScheduleRange.intersect(existingScheduleRange);
+        return newScheduleRange.intersect(existingScheduleRange) && sc.id !== existingSchedule.id;
       });
 
       return intersections.length > 0;
@@ -84,8 +84,8 @@ class SchedulesController {
     return false;
   }
 
-  async __validateScheduleDates(ropeway, schedule) {
-    const isIntersected = await this.__isScheduleIntersected(ropeway, schedule);
+  async __validateScheduleDates(ropeway, schedule, existingSchedule) {
+    const isIntersected = await this.__isScheduleIntersected(ropeway, schedule, existingSchedule);
     const isDateToInPast = moment(schedule.dateTo).isBefore(moment());
     const isDateFromSameOrAfterDateTo = moment(schedule.dateFrom).isSameOrAfter(schedule.dateTo);
 

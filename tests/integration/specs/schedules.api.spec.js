@@ -1,4 +1,5 @@
 const request = require('supertest');
+const moment = require('moment');
 const using = require('jasmine-data-provider');
 const app = require('../../../app');
 const {newPark} = require('../data/parks');
@@ -10,7 +11,8 @@ const {
   defaultValues,
   updateScheduleData,
   validation,
-  scheduleForDelete
+  scheduleForDelete,
+  scheduleDataWithUsedDates,
 } = require('../data/schedules');
 const {formatTimestamp} = require('../helpers');
 
@@ -175,6 +177,70 @@ describe('Schedule spec.', () => {
 
       expect(res.statusCode).toBe(404, 'Status code is not correct');
     });
+
+    describe('Same or intersected range', () => {
+      let preconditionScheduleId;
+      let existingScheduleData;
+
+      beforeAll(async () => {
+        const {parkId, ropewayId} = initialRopeway;
+
+        const scheduleData = newScheduleData();
+        const res = await request(app)
+          .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+          .send(scheduleData);
+
+        preconditionScheduleId = res.body.id;
+        expect(preconditionScheduleId).not.toBeUndefined('Ropeway has not been created');
+        existingScheduleData = scheduleData;
+      });
+
+      it('should create schedule with same range for another ropeway', async () => {
+        const {parkId} = initialRopeway;
+        const ropewayId = (await request(app)
+          .post(`/parks/${parkId}/ropeways`)
+          .send(newRopeway())).body.id;
+        expect(ropewayId).not.toBeUndefined('Ropeway has not been created');
+
+
+        const scheduleData = scheduleDataWithUsedDates();
+        const res = await request(app)
+          .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+          .send(scheduleData);
+
+        const createdSchedule = res.body;
+
+        expect(res.statusCode).toBe(201, `Status code is not correct.`);
+        expect(createdSchedule.dateFrom).toBe(scheduleData.dateFrom, 'Date from is incorrect');
+        expect(createdSchedule.dateTo).toBe(scheduleData.dateTo, 'Date to is incorrect');
+        expect(createdSchedule.timeFrom).toBe(scheduleData.timeFrom, 'Time from is not correct');
+        expect(createdSchedule.timeTo).toBe(scheduleData.timeTo, 'Time to is not correct');
+        expect(createdSchedule.duration).toBe(defaultValues.duration, 'Duration is not correct');
+        expect(createdSchedule.interval).toBe(createdSchedule.duration, 'Interval is not correct');
+        expect(createdSchedule.weekMask).toBe(defaultValues.weekMask, 'Interval is not correct');
+        expect(createdSchedule.createdAt).not.toBeUndefined('created at is absent');
+        expect(createdSchedule.updatedAt).not.toBeUndefined('updated at is absent');
+        expect(createdSchedule.deletedAt).toBeUndefined('deleted at is present');
+      });
+
+      it('should update schedule by self intersected dates', async () => {
+        const dateFormat = 'YYYY-MM-DD';
+        const dateFrom = moment(existingScheduleData.dateFrom, dateFormat).add(1, 'week').format(dateFormat);
+        const payload = Object.assign({}, existingScheduleData);
+        payload.dateFrom = dateFrom;
+        const {parkId, ropewayId} = initialRopeway;
+        const res = await request(app)
+          .put(`/parks/${parkId}/ropeways/${ropewayId}/schedules/${preconditionScheduleId}`)
+          .send(payload);
+
+        if (res.statusCode !== 200) {
+          console.log(res)
+        }
+        ;
+
+        expect(res.statusCode).toBe(200, `Incorrect status code.`);
+      })
+    });
   });
 
   describe('Negative flow.', () => {
@@ -191,8 +257,8 @@ describe('Schedule spec.', () => {
       expect(res.statusCode).toBe(201, 'Precondition reserved schedule has not been created');
     });
 
-    describe('Create schedule with', ()=>{
-      using(validation, (validationData, validationType)=>{
+    describe('Create schedule with', () => {
+      using(validation, (validationData, validationType) => {
         describe(`invalid ${validationType}:`, () => {
 
           using(validationData, (values, description) => {
@@ -210,8 +276,17 @@ describe('Schedule spec.', () => {
       });
     });
 
-    describe('Update schedule with', ()=>{
-      using(validation, (validationData, validationType)=>{
+    describe('Update schedule with', () => {
+      beforeAll(async () => {
+        const {parkId, ropewayId} = initialRopeway;
+        const scheduleData = newScheduleData();
+        const res = await request(app)
+          .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+          .send(scheduleData);
+        expect(res.statusCode).toBe(201, 'Precondition reserved schedule has not been created for UPDATE tests');
+      });
+
+      using(validation, (validationData, validationType) => {
         describe(`invalid ${validationType}:`, () => {
 
           using(validationData, (values, description) => {
@@ -230,7 +305,6 @@ describe('Schedule spec.', () => {
     })
   });
 });
-
 
 async function preparePrecondition() {
   let userId;
