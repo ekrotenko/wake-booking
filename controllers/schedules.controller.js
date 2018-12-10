@@ -50,7 +50,9 @@ class SchedulesController {
         await this.__validateScheduleDates(req.ropeway, req.body, req.schedule);
       }
 
-      if (req.body.timeFrom || req.body.timeTo) { this.__validateScheduleTimeRange(req.body); }
+      if (req.body.timeFrom || req.body.timeTo) {
+        this.__validateScheduleTimeRange(req.body, req.schedule);
+      }
 
       res.send(await this.schedulesService
         .updateRopewaysSchedule(req.schedule, req.body));
@@ -103,13 +105,17 @@ class SchedulesController {
     }
   }
 
-  __validateScheduleTimeRange(schedule) {
+  __validateScheduleTimeRange(scheduleData, existingSchedule) {
     const timeFormat = 'HH:mm';
-    const momentTimeFrom = moment(schedule.timeFrom, timeFormat);
-    const momentTimeTo = moment(schedule.timeTo, timeFormat);
+    const defaultDuration = 60;
+
+    const momentTimeFrom = moment(scheduleData.timeFrom || existingSchedule.timeFrom, timeFormat);
+    const momentTimeTo = moment(scheduleData.timeTo || existingSchedule.timeFrom, timeFormat);
+    const scheduleDuration = scheduleData.duration || (existingSchedule && existingSchedule.duration)
+      || defaultDuration;
     const timeRangeDuration = Moment.duration(momentTimeTo.diff(momentTimeFrom), 'ms').asMinutes();
 
-    const isTimeRangeLessThanDuration = timeRangeDuration < schedule.duration;
+    const isTimeRangeLessThanDuration = timeRangeDuration < scheduleDuration;
 
     if (isTimeRangeLessThanDuration) {
       throw new Error('Time interval cannot be less than duration');
