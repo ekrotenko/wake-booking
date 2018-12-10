@@ -88,7 +88,7 @@ module.exports = {
     return Object.assign({},
       getValidDateRange(),
       validTimeRange,
-    )
+    );
   },
   newScheduleData() {
     return Object.assign({},
@@ -98,9 +98,9 @@ module.exports = {
       getValidDurationAndInterval()
     );
   },
-  scheduleDataWithUsedDates(){
+  scheduleDataWithUsedDates() {
     return Object.assign({},
-      usedValidDateRanges[usedValidDateRanges.length-1],
+      usedValidDateRanges[usedValidDateRanges.length - 1],
       validTimeRange,
     );
   },
@@ -130,7 +130,7 @@ module.exports = {
         return Object.assign(payloadWithoutDates, {dateFrom, dateTo});
       },
       'intersectedRange': () => {
-        const {dateFrom: usedDateFrom, dateTo: usedDateTo} = usedValidDateRanges[usedValidDateRanges.length-1];
+        const {dateFrom: usedDateFrom, dateTo: usedDateTo} = usedValidDateRanges[usedValidDateRanges.length - 1];
         const intersectedDateFrom = moment(usedDateFrom).add(1, 'week').format(dateFormat);
         const intersectedDateTo = moment(usedDateTo).add(1, 'week').format(dateFormat);
         return Object.assign(payloadWithoutDates,
