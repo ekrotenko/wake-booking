@@ -53,6 +53,10 @@ module.exports = {
       .length(7)
       .regex(/^(?!0{7})[0,1]+$/, '0 and 1 only')
       .default('1111111'),
+    orderingPeriod: Joi
+      .number()
+      .integer()
+      .positive()
   }),
   joiPutValidator: Joi.object().options({abortEarly: false}).keys({
     dateFrom: Joi
@@ -93,6 +97,10 @@ module.exports = {
     weekMask: Joi
       .string()
       .length(7)
-      .regex(/^(?!0{7})[0,1]+$/, '0 and 1 only')
+      .regex(/^(?!0{7})[0,1]+$/, '0 and 1 only'),
+    orderingPeriod: Joi
+      .number()
+      .integer()
+      .positive()
   })
 };

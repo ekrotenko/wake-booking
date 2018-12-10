@@ -100,8 +100,17 @@ class SchedulesController {
     const isDateToInPast = moment(datesInterval.dateTo).isBefore(moment());
     const isDateFromSameOrAfterDateTo = moment(datesInterval.dateFrom).isSameOrAfter(datesInterval.dateTo);
 
+
     if (isIntersected || isDateToInPast || isDateFromSameOrAfterDateTo) {
       throw new Error('Schedules dates conflict');
+    }
+
+    const orderingPeriod = schedule.orderingPeriod || (existingSchedule && existingSchedule.orderingPeriod);
+    const isOrderingPeriodGreaterDatesRange = orderingPeriod >
+      moment(datesInterval.dateTo).diff(moment(datesInterval.dateFrom), 'days');
+
+    if (isOrderingPeriodGreaterDatesRange) {
+      throw new Error('Ordering period greater than dates range');
     }
   }
 
