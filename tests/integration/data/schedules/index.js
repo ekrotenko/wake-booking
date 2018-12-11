@@ -45,6 +45,13 @@ function getValidDurationAndInterval() {
   return {duration, interval};
 }
 
+function generateValidOrderingPeriod(dates) {
+  const datesRange = moment(dates.dateTo).diff(moment(dates.dateFrom), 'days');
+  const orderingPeriod = faker.random.number({min: 1, max: datesRange});
+
+  return orderingPeriod;
+}
+
 function generateNotIntersectedDates(amount) {
   let dates = [];
   let startDate = moment().subtract(1, 'months');
@@ -91,10 +98,14 @@ module.exports = {
     );
   },
   newScheduleData() {
+    const dates = getValidDateRange();
     return Object.assign({},
-      getValidDateRange(),
+      dates,
       validTimeRange,
-      {weekMask: randomWeekMask()},
+      {
+        weekMask: randomWeekMask(),
+        orderingPeriod: generateValidOrderingPeriod(dates)
+      },
       getValidDurationAndInterval()
     );
   },
@@ -111,12 +122,14 @@ module.exports = {
     )
   },
   updateScheduleData() {
+    const dates = getValidDateRange();
     return Object.assign(
-      getValidDateRange(),
+      dates,
       {
         timeFrom: '9:00',
         timeTo: '23:00',
-        weekMask: randomWeekMask()
+        weekMask: randomWeekMask(),
+        orderingPeriod: generateValidOrderingPeriod(dates)
       },
       getValidDurationAndInterval()
     )
@@ -281,6 +294,34 @@ module.exports = {
           validTimeRange,
         )
       }
+    },
+    orderingPeriod: {
+      greaterThanDatesRange(){
+        const dates = notIntersectedDates[0];
+        const schedulePeriod = moment(dates.dateTo).diff(moment(dates.dateFrom), 'days');
+        return Object.assign({},
+          dates,
+          validTimeRange,
+          {
+            weekMask: randomWeekMask(),
+            orderingPeriod: schedulePeriod+1,
+          },
+          getValidDurationAndInterval()
+        );
+      },
+      lessThanMinValue(){
+        const dates = notIntersectedDates[0];
+        return Object.assign({},
+          dates,
+          validTimeRange,
+          {
+            weekMask: randomWeekMask(),
+            orderingPeriod: faker.random.number({max:0}),
+          },
+          getValidDurationAndInterval()
+        );
+      },
+
     }
   }
 };

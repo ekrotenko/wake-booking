@@ -35,8 +35,11 @@ class SchedulesController {
       await this.__validateScheduleDates(req.ropeway, req.body);
       this.__validateScheduleTimeRange(req.body);
 
-      res.status(201).send(await this.schedulesService
-        .addRopewaySchedule(req.ropeway, req.body));
+      const createdSchedule = await this.schedulesService
+        .addRopewaySchedule(req.ropeway, req.body);
+      createdSchedule.orderingPeriod = req.body.orderingPeriod || null;
+
+      res.status(201).send(createdSchedule);
     } catch (error) {
       next(new payloadValidator.errors.PayloadValidationError(error, error.message));
     }

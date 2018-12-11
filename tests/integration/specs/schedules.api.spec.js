@@ -43,6 +43,7 @@ describe('Schedule spec.', () => {
       expect(createdSchedule.duration).toBe(defaultValues.duration, 'Duration is not correct');
       expect(createdSchedule.interval).toBe(createdSchedule.duration, 'Interval is not correct');
       expect(createdSchedule.weekMask).toBe(defaultValues.weekMask, 'Interval is not correct');
+      expect(createdSchedule.orderingPeriod).toBeNull('Ordering period is not correct');
       expect(createdSchedule.createdAt).not.toBeUndefined('created at is absent');
       expect(createdSchedule.updatedAt).not.toBeUndefined('updated at is absent');
       expect(createdSchedule.deletedAt).toBeUndefined('deleted at is present');
@@ -66,6 +67,7 @@ describe('Schedule spec.', () => {
       expect(createdSchedule.duration).toBe(scheduleData.duration, 'Duration is not correct');
       expect(createdSchedule.interval).toBe(scheduleData.interval, 'Interval is not correct');
       expect(createdSchedule.weekMask).toBe(scheduleData.weekMask, 'Interval is not correct');
+      expect(createdSchedule.orderingPeriod).toBe(scheduleData.orderingPeriod, 'Ordering period is not correct');
       expect(createdSchedule.createdAt).not.toBeUndefined('created at is absent');
       expect(createdSchedule.updatedAt).not.toBeUndefined('updated at is absent');
       expect(createdSchedule.deletedAt).toBeUndefined('deleted at is present');
@@ -85,11 +87,11 @@ describe('Schedule spec.', () => {
       const res = await request(app)
         .get(`/parks/${parkId}/ropeways/${ropewayId}/schedules`);
 
-      const isPresentInResponse = res.body.some(schedule => schedule.id === createdSchedule.id);
+      const isSchedulePresentInResponse = res.body.some(schedule => schedule.id === createdSchedule.id);
 
       expect(res.statusCode).toBe(200, `Status code is not correct.`);
       expect(res.body.length).toBeGreaterThan(0, 'Count of schedules is incorrect');
-      expect(isPresentInResponse).toBe(true, 'Created schedule is not present in response');
+      expect(isSchedulePresentInResponse).toBe(true, 'Created schedule is not present in response');
     });
 
     it(`should get ropeway's specific schedule`, async () => {
@@ -111,6 +113,7 @@ describe('Schedule spec.', () => {
       expect(createdSchedule.duration).toBe(returnedSchedule.duration, 'Duration is not correct');
       expect(createdSchedule.interval).toBe(returnedSchedule.interval, 'Interval is not correct');
       expect(createdSchedule.weekMask).toBe(returnedSchedule.weekMask, 'Interval is not correct');
+      expect(createdSchedule.orderingPeriod).toBe(returnedSchedule.orderingPeriod, 'Ordering period is not correct');
       expect(formatTimestamp(returnedSchedule.createdAt))
         .toBe(formatTimestamp(createdSchedule.createdAt), 'created at is incorrect');
       expect(formatTimestamp(returnedSchedule.updatedAt))
@@ -139,6 +142,37 @@ describe('Schedule spec.', () => {
       expect(updatedSchedule.duration).toBe(updateData.duration, 'Duration is not correct');
       expect(updatedSchedule.interval).toBe(updateData.interval, 'Interval is not correct');
       expect(updatedSchedule.weekMask).toBe(updateData.weekMask, 'Interval is not correct');
+      expect(updatedSchedule.orderingPeriod).toBe(updateData.orderingPeriod, 'Ordering period is not correct');
+      expect(formatTimestamp(updatedSchedule.createdAt))
+        .toBe(formatTimestamp(createdSchedule.createdAt), 'created at is incorrect');
+      expect(updatedSchedule.updatedAt)
+        .not.toBe(createdSchedule.updatedAt, 'updated at is incorrect');
+      expect(updatedSchedule.deletedAt).toBe(null, 'deleted at is not null');
+    });
+
+    it(`should update ropeway's specific schedule orderingPeriod by null`, async () => {
+      const {parkId, ropewayId} = initialRopeway;
+      const updateData = updateScheduleData();
+      updateData.orderingPeriod = null;
+      const createdSchedule = (await request(app)
+        .post(`/parks/${parkId}/ropeways/${ropewayId}/schedules`)
+        .send(newScheduleData()))
+        .body;
+
+      const res = await request(app)
+        .put(`/parks/${parkId}/ropeways/${ropewayId}/schedules/${createdSchedule.id}`)
+        .send(updateData);
+      const updatedSchedule = res.body;
+
+      expect(res.statusCode).toBe(200, `Status code is not correct.`);
+      expect(updatedSchedule.dateFrom).toBe(updateData.dateFrom, 'Date from is incorrect');
+      expect(updatedSchedule.dateTo).toBe(updateData.dateTo, 'Date to is incorrect');
+      expect(updatedSchedule.timeFrom).toBe(updateData.timeFrom, 'Time from is not correct');
+      expect(updatedSchedule.timeTo).toBe(updateData.timeTo, 'Time to is not correct');
+      expect(updatedSchedule.duration).toBe(updateData.duration, 'Duration is not correct');
+      expect(updatedSchedule.interval).toBe(updateData.interval, 'Interval is not correct');
+      expect(updatedSchedule.weekMask).toBe(updateData.weekMask, 'Interval is not correct');
+      expect(updatedSchedule.orderingPeriod).toBeNull('Ordering period is not correct');
       expect(formatTimestamp(updatedSchedule.createdAt))
         .toBe(formatTimestamp(createdSchedule.createdAt), 'created at is incorrect');
       expect(updatedSchedule.updatedAt)
@@ -165,6 +199,7 @@ describe('Schedule spec.', () => {
       expect(deletedSchedule.duration).toBe(createdSchedule.duration, 'Duration is not correct');
       expect(deletedSchedule.interval).toBe(createdSchedule.interval, 'Interval is not correct');
       expect(deletedSchedule.weekMask).toBe(createdSchedule.weekMask, 'Interval is not correct');
+      expect(createdSchedule.orderingPeriod).toBeNull('Ordering period is not correct');
       expect(formatTimestamp(deletedSchedule.createdAt))
         .toBe(formatTimestamp(createdSchedule.createdAt), 'created at is incorrect');
       expect(deletedSchedule.updatedAt)
@@ -218,6 +253,8 @@ describe('Schedule spec.', () => {
         expect(createdSchedule.duration).toBe(defaultValues.duration, 'Duration is not correct');
         expect(createdSchedule.interval).toBe(createdSchedule.duration, 'Interval is not correct');
         expect(createdSchedule.weekMask).toBe(defaultValues.weekMask, 'Interval is not correct');
+        expect(createdSchedule.orderingPeriod).toBeNull(createdSchedule.orderingPeriod
+          , 'Ordering period is not correct');
         expect(createdSchedule.createdAt).not.toBeUndefined('created at is absent');
         expect(createdSchedule.updatedAt).not.toBeUndefined('updated at is absent');
         expect(createdSchedule.deletedAt).toBeUndefined('deleted at is present');
@@ -232,11 +269,6 @@ describe('Schedule spec.', () => {
         const res = await request(app)
           .put(`/parks/${parkId}/ropeways/${ropewayId}/schedules/${preconditionScheduleId}`)
           .send(payload);
-
-        if (res.statusCode !== 200) {
-          console.log(res)
-        }
-        ;
 
         expect(res.statusCode).toBe(200, `Incorrect status code.`);
       })

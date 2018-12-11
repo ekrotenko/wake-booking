@@ -56,7 +56,7 @@ module.exports = {
     orderingPeriod: Joi
       .number()
       .integer()
-      .positive()
+      .min(1)
   }),
   joiPutValidator: Joi.object().options({abortEarly: false}).keys({
     dateFrom: Joi
@@ -101,6 +101,7 @@ module.exports = {
     orderingPeriod: Joi
       .number()
       .integer()
-      .positive()
+      .min(1)
+      .allow(null)
   })
 };
