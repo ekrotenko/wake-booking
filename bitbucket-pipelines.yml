@@ -11,7 +11,6 @@ pipelines:
         caches:
           - node
         script: # Modify the commands below to build your repository.
-          - npm i sequelize-cli -g
           - npm install
     - step:
         # set HEROKU_API_KEY and HEROKU_APP_NAME environment variables
@@ -21,5 +20,6 @@ pipelines:
         # trigger: manual  # uncomment to have a manual step
         script:
           - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git HEAD
-          -  npm run migrate
+          - npm i sequelize-cli -g
+          - npm run migrate
 
