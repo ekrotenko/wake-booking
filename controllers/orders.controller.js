@@ -52,9 +52,10 @@ class OrdersController {
     const ropewayTimeSlots = await this.timeSlotsService.getRopewayTimeSlotsByDate(req.body.ropewayId, req.body.date);
     const schedule = await this.scheduleService.getRopewayScheduleByDate(req.body.ropewayId, req.body.date);
     try {
+      this.orderValidationService.verifyDate(req.body, schedule);
       this.orderValidationService.verifyScheduleInterval(req.body, ropewayTimeSlots);
       this.orderValidationService.verifyTimeSlotIsAvailable(req.body, ropewayTimeSlots);
-      this.orderValidationService.verifyScheduleRange(req.body, schedule);
+      this.orderValidationService.verifyScheduleTimeRange(req.body, schedule);
       this.orderValidationService.verifyDuration(req.body, schedule);
       res.status(201).send(await this.ordersService.createOrder(req.body));
     } catch (error) {

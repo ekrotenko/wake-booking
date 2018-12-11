@@ -35,8 +35,11 @@ class SchedulesController {
       await this.__validateScheduleDates(req.ropeway, req.body);
       this.__validateScheduleTimeRange(req.body);
 
-      res.status(201).send(await this.schedulesService
-        .addRopewaySchedule(req.ropeway, req.body));
+      const createdSchedule = await this.schedulesService
+        .addRopewaySchedule(req.ropeway, req.body);
+      createdSchedule.orderingPeriod = req.body.orderingPeriod || null;
+
+      res.status(201).send(createdSchedule);
     } catch (error) {
       next(new payloadValidator.errors.PayloadValidationError(error, error.message));
     }
@@ -100,8 +103,17 @@ class SchedulesController {
     const isDateToInPast = moment(datesInterval.dateTo).isBefore(moment());
     const isDateFromSameOrAfterDateTo = moment(datesInterval.dateFrom).isSameOrAfter(datesInterval.dateTo);
 
+
     if (isIntersected || isDateToInPast || isDateFromSameOrAfterDateTo) {
       throw new Error('Schedules dates conflict');
+    }
+
+    const orderingPeriod = schedule.orderingPeriod || (existingSchedule && existingSchedule.orderingPeriod);
+    const isOrderingPeriodGreaterDatesRange = orderingPeriod >
+      moment(datesInterval.dateTo).diff(moment(datesInterval.dateFrom), 'days');
+
+    if (isOrderingPeriodGreaterDatesRange) {
+      throw new Error('Ordering period greater than dates range');
     }
   }
 

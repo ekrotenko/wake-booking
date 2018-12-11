@@ -3,6 +3,7 @@ const timeSlotsService = require('./time.slots.service');
 const moment = require('moment');
 
 const timeFormat = 'HH:mm';
+const dateFormat = 'YYYY-MM-DD';
 
 class OrderValidationService {
   constructor(timeSlotsService) {
@@ -27,7 +28,7 @@ class OrderValidationService {
     }
   }
 
-  verifyScheduleRange(requestedOrder, schedule) {
+  verifyScheduleTimeRange(requestedOrder, schedule) {
     if (moment(requestedOrder.startAt, timeFormat).isBefore(moment(schedule.timeFrom, timeFormat)) ||
             moment(requestedOrder.endAt, timeFormat).isAfter(moment(schedule.timeTo, timeFormat))) {
       throw new Error('Start/end time is out of park schedule');
@@ -39,6 +40,18 @@ class OrderValidationService {
 
     if (slotDuration % schedule.duration > 0) {
       throw new Error(`Duration should be a multiple of ${schedule.duration} minutes`);
+    }
+  }
+
+  verifyDate(requestedOrder, schedule) {
+    const { orderingPeriod } = schedule.orderingPeriod;
+
+    const isOrderDateAvailable = orderingPeriod ?
+      moment().add(orderingPeriod, 'days').isSameOrBefore(moment(requestedOrder.date, dateFormat)) :
+      true;
+
+    if (!isOrderDateAvailable) {
+      throw new Error('Date is not available for ordering');
     }
   }
 }

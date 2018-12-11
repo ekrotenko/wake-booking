@@ -44,6 +44,10 @@ module.exports = {
         allowNull: false,
         defaultValue: '1111111',
       },
+      orderingPeriod: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
       },

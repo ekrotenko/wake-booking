@@ -51,6 +51,13 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
     },
+    orderingPeriod: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        min: 1,
+      },
+    },
   }, {
     sequelize,
     tableName: 'schedules',
