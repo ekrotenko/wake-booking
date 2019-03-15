@@ -1,12 +1,8 @@
 const parksService = require('../services/parks.service');
-const parksUsersService = require('../services/parks.users.service');
-const parkRopewaysService = require('../services/parks.ropeways.service');
 
 class ParksController {
-  constructor(parksService, parksUsersService, parkRopewaysService) {
+  constructor(parksService) {
     this.__parksService = parksService;
-    this.__parksUsersService = parksUsersService;
-    this.__parksRopewaysService = parkRopewaysService;
   }
 
   async getAllParks(req, res) {
@@ -46,19 +42,19 @@ class ParksController {
   }
 
   async removeAdmin(req, res, next) {
-    res.send(await this.__parksUsersService
+    res.send(await this.__parksService
       .removeAdmin(req.park, req.params.userId)
       .catch(next));
   }
 
   async addAdmin(req, res, next) {
-    res.send(await this.__parksUsersService
+    res.send(await this.__parksService
       .addParkAdmin(req.park, req.params.userId)
       .catch(next));
   }
 
   async addOwner(req, res, next) {
-    res.send(await this.__parksUsersService
+    res.send(await this.__parksService
       .addParkOwner(req.park, req.params.userId)
       .catch(next));
   }
@@ -66,7 +62,7 @@ class ParksController {
   async createRopeway(req, res, next) {
     try {
       const { park } = req;
-      const ropeway = await this.__parksRopewaysService
+      const ropeway = await this.__parksService
         .createRopewayInPark(park, req.body);
 
       res.status(201).send(ropeway);
@@ -76,8 +72,4 @@ class ParksController {
   }
 }
 
-module.exports = new ParksController(
-  parksService,
-  parksUsersService,
-  parkRopewaysService,
-);
+module.exports = new ParksController(parksService);

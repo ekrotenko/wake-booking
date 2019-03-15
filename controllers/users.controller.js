@@ -1,10 +1,10 @@
 const usersService = require('../services/users.service');
-const parksUsersService = require('../services/parks.users.service');
+const parksService = require('../services/parks.service');
 
 class UsersController {
-  constructor(usersService, parksUsersService) {
+  constructor(usersService, parksService) {
     this.__usersService = usersService;
-    this.__parksUsersService = parksUsersService;
+    this.__parksService = parksService;
   }
 
   async getAll(req, res) {
@@ -46,7 +46,7 @@ class UsersController {
       if (!user.isOwner) {
         user = await this.__usersService.updateUserData(req.user, { isOwner: true });
       }
-      const park = await this.__parksUsersService.createPark(user, req.body);
+      const park = await this.__parksService.createParkForUser(user, req.body);
       const responseData = {
         user: {
           id: req.user.id,
@@ -61,4 +61,4 @@ class UsersController {
   }
 }
 
-module.exports = new UsersController(usersService, parksUsersService);
+module.exports = new UsersController(usersService, parksService);
