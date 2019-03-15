@@ -26,6 +26,14 @@ class ParksService {
   async deletePark(park) {
     return park.destroy();
   }
+
+  async getParkRopeways(park) {
+    return park.getRopeways();
+  }
+
+  async createRopewayInPark(park, ropewayData) {
+    return park.createRopeway(ropewayData);
+  }
 }
 
 module.exports = new ParksService(Park);

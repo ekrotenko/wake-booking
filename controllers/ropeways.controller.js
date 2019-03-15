@@ -1,10 +1,10 @@
 const ropewaysService = require('../services/ropeways.service');
-const parksRopewaysService = require('../services/parks.ropeways.service');
+const parksService = require('../services/parks.service');
 
 class RopewaysController {
-  constructor(ropewayService, parksRopewaysService) {
+  constructor(ropewayService, parksService) {
     this.__ropewayService = ropewayService;
-    this.__parksRopewaysService = parksRopewaysService;
+    this.__parksService = parksService;
   }
 
   async setRopewayParam(req, res, next) {
@@ -23,12 +23,12 @@ class RopewaysController {
   }
 
   async getParkRopeways(req, res) {
-    await res.send(await this.__parksRopewaysService
+    await res.send(await this.__parksService
       .getParkRopeways(req.park));
   }
 
   async addParkRopeway(req, res, next) {
-    res.status(201).send(await this.__parksRopewaysService
+    res.status(201).send(await this.__parksService
       .createRopewayInPark(req.park, req.body)
       .catch(next));
   }
@@ -48,5 +48,5 @@ class RopewaysController {
 
 module.exports = new RopewaysController(
   ropewaysService,
-  parksRopewaysService,
+  parksService,
 );

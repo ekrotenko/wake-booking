@@ -1,12 +1,10 @@
 const parksService = require('../services/parks.service');
 const parksUsersService = require('../services/parks.users.service');
-const parkRopewaysService = require('../services/parks.ropeways.service');
 
 class ParksController {
-  constructor(parksService, parksUsersService, parkRopewaysService) {
+  constructor(parksService, parksUsersService) {
     this.__parksService = parksService;
     this.__parksUsersService = parksUsersService;
-    this.__parksRopewaysService = parkRopewaysService;
   }
 
   async getAllParks(req, res) {
@@ -66,7 +64,7 @@ class ParksController {
   async createRopeway(req, res, next) {
     try {
       const { park } = req;
-      const ropeway = await this.__parksRopewaysService
+      const ropeway = await this.__parksService
         .createRopewayInPark(park, req.body);
 
       res.status(201).send(ropeway);
@@ -79,5 +77,4 @@ class ParksController {
 module.exports = new ParksController(
   parksService,
   parksUsersService,
-  parkRopewaysService,
 );
