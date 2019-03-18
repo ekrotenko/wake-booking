@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const ropewaysRouter = require('./ropeways.router');
-const parksController = require('../controllers/parks.controller');
+const parksController = require('../../../controllers/parks.controller');
 
 router.param('id', parksController.setParkParam.bind(parksController));
 router.get('/', parksController.getAllParks.bind(parksController));

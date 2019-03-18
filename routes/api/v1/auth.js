@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const router = require('express').Router();
-const User = require('../models/user');
-const config = require('../config/app');
+const User = require('../../../models/user');
+const config = require('../../../config/app');
 const jwt = require('jwt-simple');
 
 router.post('/token', (req, res, next) => {

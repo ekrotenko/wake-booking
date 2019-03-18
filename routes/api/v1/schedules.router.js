@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const schedulesController = require('../controllers/schedules.controller');
+const schedulesController = require('../../../controllers/schedules.controller');
 
 router.param('id', schedulesController.setScheduleParam.bind(schedulesController));
 router.get('/:id', schedulesController.getScheduleById.bind(schedulesController));

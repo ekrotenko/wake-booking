@@ -3,7 +3,7 @@ const app = require('../../../app');
 const data = require('../data/user');
 const using = require('jasmine-data-provider');
 
-const url = '/users';
+const url = '/api/v1/users';
 
 describe('Users spec.', () => {
 

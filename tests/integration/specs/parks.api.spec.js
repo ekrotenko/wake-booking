@@ -5,7 +5,7 @@ const app = require('../../../app');
 const userData = require('../data/user/index');
 const parksData = require('../data/parks');
 
-const usersUrl = '/users';
+const usersUrl = '/api/v1/users';
 const usersParksUrl = id => `${usersUrl}/${id}/parks`;
 
 describe('Parks spec.', () => {
@@ -17,7 +17,7 @@ describe('Parks spec.', () => {
       const newPark = parksData.newPark();
 
       const userId = (await request(app)
-        .post('/users')
+        .post(usersUrl)
         .send(newUser))
         .body.id;
 
