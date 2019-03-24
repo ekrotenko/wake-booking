@@ -4,7 +4,6 @@ const ordersController = require('../../../controllers/orders.controller');
 
 router.param('id', ordersController.setOrderParameter.bind(ordersController));
 router.get('/ropeway/:ropewayId', ordersController.getRopewayOrders.bind(ordersController));
-router.get('/available', ordersController.getRopewayAvailableTimeSlots.bind(ordersController));
 router.post('/', /* auth.authenticate() */ ordersController.createOrder.bind(ordersController));
 
 module.exports = router;
