@@ -24,5 +24,5 @@ const envConfig = {
   },
 };
 
-module.exports = (() => envConfig[process.env.NODE_ENV])();
+module.exports = envConfig[process.env.NODE_ENV];
 

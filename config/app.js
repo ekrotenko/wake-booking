@@ -33,4 +33,4 @@ const appConfig = {
   },
 };
 
-module.exports = (() => appConfig[process.env.NODE_ENV])();
+module.exports = appConfig[process.env.NODE_ENV];

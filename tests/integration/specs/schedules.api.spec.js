@@ -1,6 +1,7 @@
 const request = require('supertest');
 const moment = require('moment');
 const using = require('jasmine-data-provider');
+const { dateFormat } = require('../../../config');
 const app = require('../../../app');
 const { newPark } = require('../data/parks');
 const { newUser } = require('../data/user');
@@ -264,7 +265,6 @@ describe('Schedule spec.', () => {
       });
 
       it('should update schedule by self intersected dates', async () => {
-        const dateFormat = 'YYYY-MM-DD';
         const dateFrom = moment(existingScheduleData.dateFrom, dateFormat).add(1, 'week').format(dateFormat);
         const payload = Object.assign({}, existingScheduleData);
         payload.dateFrom = dateFrom;

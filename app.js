@@ -4,11 +4,9 @@ const express = require('express');
 const volleyball = require('volleyball');
 const bodyParser = require('body-parser');
 const path = require('path');
-const config = require('./config/app');
+const config = require('./config');
 const auth = require('./libs/auth')();
 const router = require('./routes');
-
-// Routers:
 
 const app = express();
 
@@ -46,7 +44,7 @@ app.use((err, req, res, next) => {
   next();
 });
 
-const server = app.listen(process.env.PORT || (config.port), () => {
+const server = app.listen(process.env.PORT || (config.app.port), () => {
   console.log('Listening on port:', server.address().port);
 });
 

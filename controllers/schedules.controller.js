@@ -2,6 +2,8 @@ const scheduleService = require('../services/schedules.service');
 const payloadValidator = require('../libs/helpers/payload-validation-helper');
 const validator = require('./payload.validations/schedule');
 
+const { timeFormat } = require('../config');
+
 const Moment = require('moment');
 const MomentRange = require('moment-range');
 
@@ -118,7 +120,6 @@ class SchedulesController {
   }
 
   __validateScheduleTimeRange(scheduleData, existingSchedule) {
-    const timeFormat = 'HH:mm';
     const defaultDuration = 60;
 
     const momentTimeFrom = moment(scheduleData.timeFrom || existingSchedule.timeFrom, timeFormat);

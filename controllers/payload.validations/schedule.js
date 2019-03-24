@@ -1,18 +1,18 @@
 const BaseJoi = require('joi');
 const JoiExtension = require('joi-date-extensions');
+
 const Joi = BaseJoi.extend(JoiExtension);
 const moment = require('moment');
-const timeFormat = 'H:mm';
-const dateFormat = 'YYYY-MM-DD';
+
+const { timeFormat, dateFormat } = require('../../config');
 
 module.exports = {
-  joiPostValidator: Joi.object().options({abortEarly: false}).keys({
+  joiPostValidator: Joi.object().options({ abortEarly: false }).keys({
     dateFrom: Joi
       .date()
       .required()
       .format(dateFormat)
-      .greater(moment().subtract(3, 'months').format(dateFormat))
-    ,
+      .greater(moment().subtract(3, 'months').format(dateFormat)),
     dateTo: Joi
       .date()
       .required()
@@ -27,15 +27,14 @@ module.exports = {
       .required()
       .format(timeFormat)
       .greater(Joi.ref('timeFrom'))
-      .error(error => {
+      .error((error) => {
         const dateGreaterError = error.filter(e => e.type === 'date.greater');
         if (dateGreaterError.length > 0) {
           return `"timeTo" must be greater than "${moment(dateGreaterError[0].context.limit)
-            .format(timeFormat)}"`
+            .format(timeFormat)}"`;
         }
         return error;
-      })
-    ,
+      }),
     duration: Joi
       .number()
       .integer()
@@ -46,8 +45,7 @@ module.exports = {
       .integer()
       .valid(5, 10, 15, 30, 60, 90, 120)
       .max(Joi.ref('duration'))
-      .default(Joi.ref('duration'))
-    ,
+      .default(Joi.ref('duration')),
     weekMask: Joi
       .string()
       .length(7)
@@ -56,14 +54,13 @@ module.exports = {
     orderingPeriod: Joi
       .number()
       .integer()
-      .min(1)
+      .min(1),
   }),
-  joiPutValidator: Joi.object().options({abortEarly: false}).keys({
+  joiPutValidator: Joi.object().options({ abortEarly: false }).keys({
     dateFrom: Joi
       .date()
       .format(dateFormat)
-      .greater(moment().subtract(3, 'months').format(dateFormat))
-    ,
+      .greater(moment().subtract(3, 'months').format(dateFormat)),
     dateTo: Joi
       .date()
       .format(dateFormat)
@@ -75,15 +72,14 @@ module.exports = {
       .date()
       .format(timeFormat)
       .greater(Joi.ref('timeFrom'))
-      .error(error => {
+      .error((error) => {
         const dateGreaterError = error.filter(e => e.type === 'date.greater');
         if (dateGreaterError.length > 0) {
           return `"timeTo" must be greater than "${moment(dateGreaterError[0].context.limit)
-            .format(timeFormat)}"`
+            .format(timeFormat)}"`;
         }
         return error;
-      })
-    ,
+      }),
     duration: Joi
       .number()
       .integer()
@@ -92,8 +88,7 @@ module.exports = {
       .number()
       .integer()
       .valid(5, 10, 15, 30, 60, 90, 120)
-      .max(Joi.ref('duration'))
-    ,
+      .max(Joi.ref('duration')),
     weekMask: Joi
       .string()
       .length(7)
@@ -102,6 +97,6 @@ module.exports = {
       .number()
       .integer()
       .min(1)
-      .allow(null)
-  })
+      .allow(null),
+  }),
 };
