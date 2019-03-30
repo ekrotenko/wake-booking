@@ -2,7 +2,7 @@ const { InaccessibleTimeSlot } = require('../models');
 const ropewaysService = require('./ropeways.service');
 const moment = require('moment');
 
-const timeFormat = 'HH:mm';
+const { timeFormat } = require('../config');
 
 class InaccessibleTimeSlotsService {
   constructor(itsModel, ropewaysService) {

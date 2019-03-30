@@ -4,16 +4,9 @@ const express = require('express');
 const volleyball = require('volleyball');
 const bodyParser = require('body-parser');
 const path = require('path');
-const config = require('./config/app');
+const config = require('./config');
 const auth = require('./libs/auth')();
-
-// Routers:
-const parksRouter = require('./routes/parks.router');
-const usersRouter = require('./routes/users.router');
-const ordersRouter = require('./routes/orders.router');
-const schedules = require('./routes/schedules.router');
-const inaccessibleSlots = require('./routes/inaccessible.time.slots.router');
-const authRoute = require('./routes/auth');
+const router = require('./routes');
 
 const app = express();
 
@@ -34,12 +27,7 @@ app.use((req, res, next) => {
 // Auth
 app.use(auth.initialize());
 // Using routers:
-app.use('/auth', authRoute);
-app.use('/parks', parksRouter);
-app.use('/users', usersRouter);
-app.use('/orders', ordersRouter);
-app.use('/schedules', schedules);
-app.use('/inaccessible_slots', inaccessibleSlots);
+app.use(router);
 
 app.use('*', (req, res) => {
   res.send('This is default route');
@@ -56,7 +44,7 @@ app.use((err, req, res, next) => {
   next();
 });
 
-const server = app.listen(process.env.PORT || (config.port), () => {
+const server = app.listen(process.env.PORT || (config.app.port), () => {
   console.log('Listening on port:', server.address().port);
 });
 

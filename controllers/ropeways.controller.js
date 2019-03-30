@@ -13,35 +13,36 @@ class RopewaysController {
     if (!ropeway) {
       res.status(404).send('Ropeway not found');
     } else {
-      req.ropeway = ropeway;
+      // TODO: to be moved from req.query
+      req.query.ropeway = ropeway;
       next();
     }
   }
 
   async getRopewayById(req, res) {
-    await res.send(req.ropeway);
+    await res.send(req.query.ropeway);
   }
 
   async getParkRopeways(req, res) {
     await res.send(await this.__parksService
-      .getParkRopeways(req.park));
+      .getParkRopeways(req.query.park));
   }
 
   async addParkRopeway(req, res, next) {
     res.status(201).send(await this.__parksService
-      .createRopewayInPark(req.park, req.body)
+      .createRopewayInPark(req.query.park, req.body)
       .catch(next));
   }
 
   async updateParkRopeway(req, res, next) {
     res.send(await this.__ropewayService
-      .updateRopeway(req.ropeway, req.body)
+      .updateRopeway(req.query.ropeway, req.body)
       .catch(next));
   }
 
   async deleteParkRopeway(req, res, next) {
     res.send(await this.__ropewayService
-      .deleteRopeway(req.ropeway)
+      .deleteRopeway(req.query.ropeway)
       .catch(next));
   }
 }

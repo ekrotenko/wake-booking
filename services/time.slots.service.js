@@ -3,18 +3,17 @@ const { Scheduler } = require('@ssense/sscheduler');
 const scheduler = new Scheduler();
 const moment = require('moment');
 
-const timeFormat = 'HH:mm';
-const dateFormat = 'YYYY-MM-DD';
-
-const inaccessibleSlotsService = require('./inaccessible.time.slots.service');
 const scheduleService = require('./schedules.service');
+const inaccessibleSlotsService = require('./inaccessible.time.slots.service');
 const ordersService = require('./orders.service');
 
+const { timeFormat, dateFormat } = require('../config');
+
 class TimeSlotsService {
-  constructor(scheduleService, inaccessibleSlotsService) {
-    this.scheduleService = scheduleService;
-    this.inaccessibleSlotsService = inaccessibleSlotsService;
-    this.ordersService = ordersService;
+  constructor(scheduleService, inaccessibleSlotsService, ordersService) {
+    this.__scheduleService = scheduleService;
+    this.__inaccessibleSlotsService = inaccessibleSlotsService;
+    this.__ordersService = ordersService;
   }
 
   async getRopewayTimeSlotsByDate(ropewayId, date) {
@@ -24,10 +23,15 @@ class TimeSlotsService {
   }
 
   async configureSchedule(ropewayId, date) {
-    const scheduleDataSet = await this.scheduleService.getRopewayScheduleByDate(ropewayId, date);
+    const scheduleDataValues = await this.__scheduleService.getRopewayScheduleByDate(ropewayId, date);
+
+    if (!scheduleDataValues) {
+      throw new Error('Ropeway is not available on this date');
+    }
+
     const inaccessibleSlots = await this.__getUnavailability(ropewayId, date);
-    const weeklySchedule = this._getWeeklySchedule(scheduleDataSet);
-    const allocations = await this._getAllocations(ropewayId, date);
+    const weeklySchedule = this.__getWeeklySchedule(scheduleDataValues);
+    const allocations = await this.__getAllocations(ropewayId, date);
 
     Object.keys(weeklySchedule).forEach((key) => {
       weeklySchedule[key].unavailability = inaccessibleSlots.recurring[key] || [];
@@ -39,38 +43,43 @@ class TimeSlotsService {
     return {
       from: date,
       to: moment(date).add(1, 'days').format(dateFormat),
-      duration: scheduleDataSet.duration,
-      interval: scheduleDataSet.interval,
+      duration: scheduleDataValues.duration,
+      interval: scheduleDataValues.interval,
       schedule: weeklySchedule,
     };
   }
 
+  getDuration(from, to) {
+    return moment.duration(moment(to, timeFormat)
+      .diff(moment(from, timeFormat)), 'ms').asMinutes();
+  }
+
   async __getUnavailability(ropewayId, date) {
-    const ropewayInaccessibleSlots = await this.inaccessibleSlotsService
+    const ropewayInaccessibleSlots = await this.__inaccessibleSlotsService
       .getRopewayInaccessibleSlotsByDate(ropewayId, date);
     const filteredSlots = {};
 
-    filteredSlots.disposable = this._parseDisposableTimeSlots(ropewayInaccessibleSlots
+    filteredSlots.disposable = this.__parseDisposableTimeSlots(ropewayInaccessibleSlots
       .filter(slot => slot.type === 'disposable'));
 
-    filteredSlots.recurring = this._parseRecurringTimeSlots(ropewayInaccessibleSlots
+    filteredSlots.recurring = this.__parseRecurringTimeSlots(ropewayInaccessibleSlots
       .filter(slot => slot.type === 'recurring'));
 
     return filteredSlots;
   }
 
-  _parseDisposableTimeSlots(disposables) {
+  __parseDisposableTimeSlots(disposables) {
     return disposables.map(inaccessibleSlots => ({
       from: `${inaccessibleSlots.dateFrom} ${inaccessibleSlots.timeFrom}`,
       to: `${inaccessibleSlots.dateTo} ${inaccessibleSlots.timeTo}`,
     }));
   }
 
-  _parseRecurringTimeSlots(recurrings) {
+  __parseRecurringTimeSlots(recurrings) {
     const parseResult = {};
 
     recurrings.forEach((setting) => {
-      this._maskToArray(setting.weekMask).forEach((day, index) => {
+      this.__transformWeekMaskToArray(setting.weekMask).forEach((day, index) => {
         const weekDay = moment.weekdays(index).toLowerCase();
 
         parseResult[`${weekDay}`] = (!parseResult[`${weekDay}`]) ? [] : parseResult[`${weekDay}`];
@@ -87,21 +96,18 @@ class TimeSlotsService {
     return parseResult;
   }
 
-  async _getAllocations(ropewayId, date) {
-    const orders = await this.ordersService.getRopewayOrdersByDate(ropewayId, date);
+  async __getAllocations(ropewayId, date) {
+    const orders = await this.__ordersService.getRopewayOrdersByDate(ropewayId, date);
+
     return orders.map(order => ({
       from: `${order.date} ${order.startAt}`,
       duration: this.getDuration(order.startAt, order.endAt),
     }));
   }
 
-  getDuration(from, to) {
-    return moment.duration(moment(to, timeFormat)
-      .diff(moment(from, timeFormat)), 'ms').asMinutes();
-  }
-
-  _getWeeklySchedule(schedule) {
+  __getWeeklySchedule(schedule) {
     const parseResult = {};
+
     schedule.weekMask.split('').forEach((day, index) => {
       const weekDay = moment.weekdays(index).toLowerCase();
 
@@ -116,7 +122,7 @@ class TimeSlotsService {
     return parseResult;
   }
 
-  _maskToArray(intMask) {
+  __transformWeekMaskToArray(intMask) {
     let mask = (intMask).toString(2);
 
     while (mask.length < 7) {

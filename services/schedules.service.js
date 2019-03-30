@@ -18,12 +18,6 @@ class SchedulesService {
       { method: ['includesDate', date] },
     ]).findOne();
 
-    if (!ropewaySchedule) {
-      const error = new Error('Ropeway is not available on this date');
-      error.status = 422;
-      throw error;
-    }
-
     return ropewaySchedule;
   }
 

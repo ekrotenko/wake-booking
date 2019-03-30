@@ -1,7 +1,6 @@
 const moment = require('moment');
 
-const timeFormat = 'HH:mm';
-const dateFormat = 'YYYY-MM-DD';
+const { timeFormat, dateFormat } = require('../config');
 
 module.exports = (sequelize, DataTypes) => {
   class Order extends sequelize.Model {

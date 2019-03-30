@@ -19,6 +19,7 @@ class OrdersController {
       res.status(404).send('Order not found');
       next();
     } else {
+      // TODO: to be moved from req.params
       req.params.order = order;
       next();
     }
@@ -36,21 +37,10 @@ class OrdersController {
       .catch(next));
   }
 
-  async getRopewayAvailableTimeSlots(req, res, next) {
-    const { date, ropewayId } = req.query;
-    if (!date || !ropewayId) {
-      const error = new Error('Date and ropeway id are required');
-      error.status = 400;
-      throw error;
-    }
-    res.status(200).send(await this.orderValidationService
-      .getRopewayTimeSlotsByDate(ropewayId, date)
-      .catch(next));
-  }
-
   async createOrder(req, res, next) {
     const ropewayTimeSlots = await this.timeSlotsService.getRopewayTimeSlotsByDate(req.body.ropewayId, req.body.date);
     const schedule = await this.scheduleService.getRopewayScheduleByDate(req.body.ropewayId, req.body.date);
+
     try {
       this.orderValidationService.verifyDate(req.body, schedule);
       this.orderValidationService.verifyScheduleInterval(req.body, ropewayTimeSlots);

@@ -5,16 +5,19 @@ const {newPark} = require('../data/parks');
 const {newUser} = require('../data/user');
 const {newRopeway} = require('../data/ropeway');
 
+const ropewayUrl = (parkId)=> `/api/v1/parks/${parkId}/ropeways`;
+
+
 describe('Ropeways spec.', () => {
   let parkId;
 
   beforeAll(async () => {
     const {id: userId} = (await request(app)
-      .post('/users')
+      .post('/api/v1/users')
       .send(newUser())).body;
 
     parkId = (await request(app)
-      .post(`/users/${userId}/parks`)
+      .post(`/api/v1/users/${userId}/parks`)
       .send(newPark())).body.park.id;
   });
 
@@ -22,7 +25,7 @@ describe('Ropeways spec.', () => {
     it('should create new ropeway', async () => {
       const ropewayData = newRopeway();
       const res = await request(app)
-        .post(`/parks/${parkId}/ropeways`)
+        .post(ropewayUrl(parkId))
         .send(ropewayData);
 
       const createdRopeway = res.body;
@@ -37,12 +40,12 @@ describe('Ropeways spec.', () => {
 
     it('should get park ropeways', async () => {
       const createdRopeway = (await request(app)
-        .post(`/parks/${parkId}/ropeways`)
+        .post(ropewayUrl(parkId))
         .send(newRopeway()))
         .body;
 
       const res = await request(app)
-        .get(`/parks/${parkId}/ropeways`);
+        .get(ropewayUrl(parkId));
 
       const isCreatedRopewayPresent = res.body.some(ropeway=> ropeway.id===createdRopeway.id);
 
@@ -53,12 +56,12 @@ describe('Ropeways spec.', () => {
 
     it(`should get park's specific ropeway`, async () => {
       const createdRopeway = (await request(app)
-        .post(`/parks/${parkId}/ropeways`)
+        .post(ropewayUrl(parkId))
         .send(newRopeway()))
         .body;
 
       const res = await request(app)
-        .get(`/parks/${parkId}/ropeways/${createdRopeway.id}`);
+        .get(`${ropewayUrl(parkId)}/${createdRopeway.id}`);
       const returnedRopeway = res.body;
 
       expect(res.statusCode).toBe(200, `Status code is not correct.`);
@@ -73,13 +76,13 @@ describe('Ropeways spec.', () => {
 
     it(`should update park's specific ropeway`, async () => {
       const createdRopeway = (await request(app)
-        .post(`/parks/${parkId}/ropeways`)
+        .post(ropewayUrl(parkId))
         .send(newRopeway()))
         .body;
 
       const updateData = newRopeway();
       const res = await request(app)
-        .put(`/parks/${parkId}/ropeways/${createdRopeway.id}`)
+        .put(`${ropewayUrl(parkId)}/${createdRopeway.id}`)
         .send(updateData);
 
       const updatedRopeway = res.body;
@@ -96,12 +99,12 @@ describe('Ropeways spec.', () => {
 
     it(`should delete park's specific ropeway`, async () => {
       const createdRopeway = (await request(app)
-        .post(`/parks/${parkId}/ropeways`)
+        .post(ropewayUrl(parkId))
         .send(newRopeway()))
         .body;
 
       const deleteRes = await request(app)
-        .delete(`/parks/${parkId}/ropeways/${createdRopeway.id}`);
+        .delete(`${ropewayUrl(parkId)}/${createdRopeway.id}`);
 
       const deletedRopeway = deleteRes.body;
 
@@ -116,7 +119,7 @@ describe('Ropeways spec.', () => {
       expect(deletedRopeway.deletedAt).not.toBeNull('deleted at is null');
 
       const res = await request(app)
-        .get(`/parks/${parkId}/ropeways/${deletedRopeway.id}`);
+        .get(`${ropewayUrl(parkId)}/${deletedRopeway.id}`);
 
       expect(res.statusCode).toBe(404, 'Status code is not correct');
     });
