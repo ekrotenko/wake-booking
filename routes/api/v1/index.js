@@ -3,6 +3,7 @@ const router = require('express').Router();
 router.use('/auth', require('./auth'));
 router.use('/parks', require('./parks.router'));
 router.use('/users', require('./users.router'));
+router.use('/time_slots/', require('./time.slots.router'));
 // router.use('/orders', require('./orders.router'));
 // router.use('/schedules', require('./schedules.router'));
 // router.use('/inaccessible_slots', require('./inaccessible.time.slots.router'));

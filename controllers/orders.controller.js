@@ -19,6 +19,7 @@ class OrdersController {
       res.status(404).send('Order not found');
       next();
     } else {
+      // TODO: to be moved from req.params
       req.params.order = order;
       next();
     }
@@ -39,6 +40,7 @@ class OrdersController {
   async createOrder(req, res, next) {
     const ropewayTimeSlots = await this.timeSlotsService.getRopewayTimeSlotsByDate(req.body.ropewayId, req.body.date);
     const schedule = await this.scheduleService.getRopewayScheduleByDate(req.body.ropewayId, req.body.date);
+
     try {
       this.orderValidationService.verifyDate(req.body, schedule);
       this.orderValidationService.verifyScheduleInterval(req.body, ropewayTimeSlots);

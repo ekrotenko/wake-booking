@@ -1,5 +1,5 @@
 module.exports = {
-  formatTimestamp(timestamp){
+  formatTimestamp(timestamp) {
     return timestamp.split('.')[0];
   },
 };

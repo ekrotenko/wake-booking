@@ -14,13 +14,14 @@ class ParksController {
     if (!park) {
       res.status(404).send('Not found');
     } else {
-      req.park = park;
+      // TODO: to be moved from req.query
+      req.query.park = park;
       next();
     }
   }
 
   async getParkById(req, res) {
-    res.send(req.park);
+    res.send(req.query.park);
   }
 
   async updateParkData(req, res, next) {
@@ -37,25 +38,25 @@ class ParksController {
 
   async deletePark(req, res, next) {
     res.send(await this.__parksService
-      .deletePark(req.park)
+      .deletePark(req.query.park)
       .catch(next));
   }
 
   async removeAdmin(req, res, next) {
     res.send(await this.__parksService
-      .removeAdmin(req.park, req.params.userId)
+      .removeAdmin(req.query.park, req.params.userId)
       .catch(next));
   }
 
   async addAdmin(req, res, next) {
     res.send(await this.__parksService
-      .addParkAdmin(req.park, req.params.userId)
+      .addParkAdmin(req.query.park, req.params.userId)
       .catch(next));
   }
 
   async addOwner(req, res, next) {
     res.send(await this.__parksService
-      .addParkOwner(req.park, req.params.userId)
+      .addParkOwner(req.query.park, req.params.userId)
       .catch(next));
   }
 

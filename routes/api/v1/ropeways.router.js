@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const schedulesRouter = require('./schedules.router');
-const timeSlotsRouter = require('./time.slots.router');
+// const timeSlotsRouter = require('./time.slots.router');
 const ordersRouter = require('./orders.router');
 const inaccessibleTimeSlotsRouter = require('./inaccessible.time.slots.router');
 
@@ -16,7 +16,6 @@ router.delete('/:id', RopewaysController.deleteParkRopeway.bind(RopewaysControll
 
 router.use('/:id/schedules/', schedulesRouter);
 router.use('/:id/orders/', ordersRouter);
-router.use('/:id/time_slots/', timeSlotsRouter);
 router.use('/:id/inaccessible_time_slots/', inaccessibleTimeSlotsRouter);
 
 module.exports = router;

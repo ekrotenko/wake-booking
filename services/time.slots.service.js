@@ -3,11 +3,9 @@ const { Scheduler } = require('@ssense/sscheduler');
 const scheduler = new Scheduler();
 const moment = require('moment');
 
-const {
-  scheduleService,
-  inaccessibleSlotsService,
-  ordersService,
-} = require('./');
+const scheduleService = require('./schedules.service');
+const inaccessibleSlotsService = require('./inaccessible.time.slots.service');
+const ordersService = require('./orders.service');
 
 const { timeFormat, dateFormat } = require('../config');
 
@@ -25,9 +23,14 @@ class TimeSlotsService {
   }
 
   async configureSchedule(ropewayId, date) {
-    const scheduleDataSet = await this.__scheduleService.getRopewayScheduleByDate(ropewayId, date);
+    const scheduleDataValues = await this.__scheduleService.getRopewayScheduleByDate(ropewayId, date);
+
+    if (!scheduleDataValues) {
+      throw new Error('Ropeway is not available on this date');
+    }
+
     const inaccessibleSlots = await this.__getUnavailability(ropewayId, date);
-    const weeklySchedule = this.__getWeeklySchedule(scheduleDataSet);
+    const weeklySchedule = this.__getWeeklySchedule(scheduleDataValues);
     const allocations = await this.__getAllocations(ropewayId, date);
 
     Object.keys(weeklySchedule).forEach((key) => {
@@ -40,8 +43,8 @@ class TimeSlotsService {
     return {
       from: date,
       to: moment(date).add(1, 'days').format(dateFormat),
-      duration: scheduleDataSet.duration,
-      interval: scheduleDataSet.interval,
+      duration: scheduleDataValues.duration,
+      interval: scheduleDataValues.interval,
       schedule: weeklySchedule,
     };
   }
@@ -130,8 +133,4 @@ class TimeSlotsService {
   }
 }
 
-module.exports = new TimeSlotsService(
-  scheduleService,
-  inaccessibleSlotsService,
-  ordersService,
-);
+module.exports = new TimeSlotsService(scheduleService, inaccessibleSlotsService, ordersService);

@@ -4,6 +4,6 @@ const dbConfig = require('./database');
 module.exports = {
   app: appConfig,
   db: dbConfig,
-  timeFormat: 'H:mm',
+  timeFormat: 'HH:mm',
   dateFormat: 'YYYY-MM-DD',
 };

@@ -1,10 +1,11 @@
 const BaseJoi = require('joi');
 const moment = require('moment');
 const JoiExtension = require('joi-date-extensions');
+const payloadValidator = require('../libs/helpers/payload-validation-helper');
 
 const Joi = BaseJoi.extend(JoiExtension);
 const timeSlotsService = require('../services/time.slots.service');
-const payloadValidationHelper = require('../libs/helpers/payload-validation-helper');
+const { joiValidate } = require('../libs/helpers/payload-validation-helper');
 
 
 const { dateFormat } = require('../config');
@@ -23,17 +24,21 @@ class TimeSlotsController {
         .integer()
         .min(1)
         .required(),
+      park: Joi.any(),
     });
   }
 
   async getByDate(req, res, next) {
-    payloadValidationHelper(req.query, this.__joiQueryValidator);
+    joiValidate(req.query, this.__joiQueryValidator);
 
     const { date, ropewayId } = req.query;
 
-    res.status(200).send(await this.__timeSlotsServise
-      .getRopewayTimeSlotsByDate(ropewayId, date)
-      .catch(next));
+    try {
+      const slots = await this.__timeSlotsServise.getRopewayTimeSlotsByDate(ropewayId, date);
+      res.status(200).send(slots);
+    } catch (error) {
+      next(new payloadValidator.errors.PayloadValidationError(error, error.message));
+    }
   }
 }
 

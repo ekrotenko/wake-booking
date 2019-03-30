@@ -7,7 +7,7 @@ const { timeFormat, dateFormat } = require('../../../../config');
 let notIntersectedDates = generateNotIntersectedDates(20);
 const usedValidDateRanges = [];
 
-function randomWeekMask(max = 7) {
+function randomWeekMask(max = 7, dates) {
   let workingDaysAmount = faker.random.number({ min: 1, max });
   const daysArray = [];
   while (workingDaysAmount > 0) {
@@ -18,7 +18,18 @@ function randomWeekMask(max = 7) {
     daysArray.push('0');
   }
 
-  return faker.helpers.shuffle(daysArray).join('');
+  const generatedMask = faker.helpers.shuffle(daysArray);
+
+  if (dates && dates.dateFrom && dates.dateTo) {
+    const { dateFrom, dateTo } = dates;
+    const dayFrom = moment(dateFrom, dateFormat).day();
+    const dayTo = moment(dateTo, dateFormat).day();
+
+    generatedMask[dayFrom] = '1';
+    generatedMask[dayTo] = '1';
+  }
+
+  return generatedMask.join('');
 }
 
 function randomDuration() {
@@ -46,9 +57,8 @@ function getValidDurationAndInterval() {
 
 function generateValidOrderingPeriod(dates) {
   const datesRange = moment(dates.dateTo).diff(moment(dates.dateFrom), 'days');
-  const orderingPeriod = faker.random.number({ min: 1, max: datesRange });
 
-  return orderingPeriod;
+  return faker.random.number({ min: 1, max: datesRange });
 }
 
 function generateNotIntersectedDates(amount) {
@@ -76,12 +86,31 @@ function getValidDateRange() {
 }
 
 const validTimeRange = {
-  timeFrom: '8:00',
+  timeFrom: '08:00',
   timeTo: '21:00',
 };
 
 notIntersectedDates = faker.helpers.shuffle(notIntersectedDates);
-const payloadWithoutDates = Object.assign({ weekMask: randomWeekMask() }, validTimeRange, getValidDurationAndInterval());
+
+const payloadWithoutDates = Object.assign(
+  { weekMask: randomWeekMask() },
+  validTimeRange,
+  getValidDurationAndInterval(),
+);
+
+function newScheduleData() {
+  const dates = getValidDateRange();
+  return Object.assign(
+    {},
+    dates,
+    validTimeRange,
+    {
+      weekMask: randomWeekMask(7, dates),
+      orderingPeriod: generateValidOrderingPeriod(dates),
+    },
+    getValidDurationAndInterval(),
+  );
+}
 
 module.exports = {
   defaultValues: {
@@ -97,19 +126,7 @@ module.exports = {
       validTimeRange,
     );
   },
-  newScheduleData() {
-    const dates = getValidDateRange();
-    return Object.assign(
-      {},
-      dates,
-      validTimeRange,
-      {
-        weekMask: randomWeekMask(),
-        orderingPeriod: generateValidOrderingPeriod(dates),
-      },
-      getValidDurationAndInterval(),
-    );
-  },
+  newScheduleData,
   scheduleDataWithUsedDates() {
     return Object.assign(
       {},
@@ -129,9 +146,9 @@ module.exports = {
     return Object.assign(
       dates,
       {
-        timeFrom: '9:00',
+        timeFrom: '09:00',
         timeTo: '23:00',
-        weekMask: randomWeekMask(),
+        weekMask: randomWeekMask(7, dates),
         orderingPeriod: generateValidOrderingPeriod(dates),
       },
       getValidDurationAndInterval(),
@@ -307,6 +324,20 @@ module.exports = {
           notIntersectedDates[0],
           validTimeRange,
         );
+      },
+      datesNotInWeekMask() {
+        const schedule = newScheduleData();
+
+        const dayFrom = moment(schedule.dateFrom, dateFormat).day();
+        const dayTo = moment(schedule.dateTo, dateFormat).day();
+        const weekMask = schedule.weekMask.split('');
+
+        weekMask[dayFrom] = '0';
+        weekMask[dayTo] = '0';
+
+        schedule.weekMask = weekMask.join('');
+
+        return schedule;
       },
       zeroOnly() {
         const weekMask = '0000000';

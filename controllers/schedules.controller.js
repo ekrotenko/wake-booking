@@ -1,8 +1,8 @@
-const scheduleService = require('../services/schedules.service');
+const { scheduleService } = require('../services');
 const payloadValidator = require('../libs/helpers/payload-validation-helper');
 const validator = require('./payload.validations/schedule');
 
-const { timeFormat } = require('../config');
+const { timeFormat, dateFormat } = require('../config');
 
 const Moment = require('moment');
 const MomentRange = require('moment-range');
@@ -12,33 +12,39 @@ const moment = MomentRange.extendMoment(Moment);
 
 class SchedulesController {
   constructor(schedulesService) {
-    this.schedulesService = schedulesService;
+    this.__scheduleService = schedulesService;
   }
 
   async setScheduleParam(req, res, next, id) {
-    const schedule = await this.schedulesService.getScheduleById(id, {
+    const schedule = await this.__scheduleService.getScheduleById(id, {
       // include: [{ all: true }],
     });
     if (!schedule) {
       res.status(404).send('Not found');
     } else {
-      req.schedule = schedule;
+      // TODO: to be moved from req.query
+      req.query.schedule = schedule;
       next();
     }
   }
 
   async getScheduleById(req, res) {
-    res.status(200).json(req.schedule);
+    res.status(200).json(req.query.schedule);
   }
 
   async addScheduleForRopeway(req, res, next) {
+    const { ropeway } = req.query;
     try {
       payloadValidator.joiValidate(req.body, validator.joiPostValidator);
-      await this.__validateScheduleDates(req.ropeway, req.body);
+      await this.__validateScheduleDates(ropeway, req.body);
       this.__validateScheduleTimeRange(req.body);
 
-      const createdSchedule = await this.schedulesService
-        .addRopewaySchedule(req.ropeway, req.body);
+      if (req.body.weekMask) {
+        this.__validateWeekMask(req.body);
+      }
+
+      const createdSchedule = await this.__scheduleService
+        .addRopewaySchedule(ropeway, req.body);
       createdSchedule.orderingPeriod = req.body.orderingPeriod || null;
 
       res.status(201).send(createdSchedule);
@@ -48,38 +54,47 @@ class SchedulesController {
   }
 
   async updateSchedule(req, res, next) {
+    const { ropeway, schedule } = req.query;
     try {
       payloadValidator.joiValidate(req.body, validator.joiPutValidator);
 
       if (req.body.dateFrom || req.body.dateTo) {
-        await this.__validateScheduleDates(req.ropeway, req.body, req.schedule);
+        await this.__validateScheduleDates(ropeway, req.body, schedule);
       }
 
       if (req.body.timeFrom || req.body.timeTo) {
-        this.__validateScheduleTimeRange(req.body, req.schedule);
+        this.__validateScheduleTimeRange(req.body, schedule);
       }
 
-      res.send(await this.schedulesService
-        .updateRopewaysSchedule(req.schedule, req.body));
+      if (req.body.weekMask) {
+        this.__validateWeekMask({
+          dateFrom: req.body.dateFrom || schedule.dateFrom,
+          dateTo: req.body.dateTo || schedule.dateTo,
+          weekMask: req.body.weekMask,
+        });
+      }
+
+      res.send(await this.__scheduleService
+        .updateRopewaysSchedule(schedule, req.body));
     } catch (error) {
       next(new payloadValidator.errors.PayloadValidationError(error, error.message));
     }
   }
 
   async getRopewaySchedules(req, res, next) {
-    res.send(await this.schedulesService
-      .getRopewaysSchedules(req.ropeway)
+    res.send(await this.__scheduleService
+      .getRopewaysSchedules(req.query.ropeway)
       .catch(next));
   }
 
   async deleteSchedule(req, res, next) {
-    res.send(await this.schedulesService
-      .deleteRopewaySchedule(req.schedule, req.body)
+    res.send(await this.__scheduleService
+      .deleteRopewaySchedule(req.query.schedule, req.body)
       .catch(next));
   }
 
   async __isScheduleIntersected(ropeway, datesInterval, existingSchedule) {
-    const schedules = await this.schedulesService.getRopewaysSchedules(ropeway);
+    const schedules = await this.__scheduleService.getRopewaysSchedules(ropeway);
 
     if (schedules.length) {
       const newScheduleRange = moment.range(moment(datesInterval.dateFrom), moment(datesInterval.dateTo));
@@ -132,6 +147,18 @@ class SchedulesController {
 
     if (isTimeRangeLessThanDuration) {
       throw new Error('Time interval cannot be less than duration');
+    }
+  }
+
+  __validateWeekMask(scheduleData) {
+    const dayFrom = moment(scheduleData.dateFrom, dateFormat).day();
+    const dayTo = moment(scheduleData.dateTo, dateFormat).day();
+    const weekMaskDays = scheduleData.weekMask.split('');
+
+    const isDatesInWeek = weekMaskDays[dayFrom] === '1' && weekMaskDays[dayTo] === '1';
+
+    if (!isDatesInWeek) {
+      throw new Error('Schedule dates do not fit week mask');
     }
   }
 }
